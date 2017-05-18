@@ -25,6 +25,12 @@ namespace SuperAdventure
             _player.Inventory.Add(new InventoryItem(
                 World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));
 
+            UpdatePlayerStats();
+        }
+
+        private void UpdatePlayerStats()
+        {
+            // Refresh player information and inventory controls
             lblHitPoints.Text = _player.CurrentHitPoints.ToString();
             lblGold.Text = _player.Gold.ToString();
             lblExperience.Text = _player.ExperiencePoints.ToString();
@@ -204,6 +210,9 @@ namespace SuperAdventure
                 btnUseWeapon.Visible = false;
                 btnUsePotion.Visible = false;
             }
+
+            // Refresh the player's stats
+            UpdatePlayerStats();
 
             // Refresh the player's inventory list
             UpdateInventoryListInUI();
@@ -423,12 +432,7 @@ namespace SuperAdventure
                     }
                 }
 
-                // Refresh player information and inventory controls
-                lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-                lblGold.Text = _player.Gold.ToString();
-                lblExperience.Text = _player.ExperiencePoints.ToString();
-                lblLevel.Text = _player.Level.ToString();
-
+                UpdatePlayerStats();
                 UpdateInventoryListInUI();
                 UpdateWeaponListInUI();
                 UpdatePotionListInUI();
