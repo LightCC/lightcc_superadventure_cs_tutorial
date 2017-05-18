@@ -56,9 +56,9 @@ namespace SuperAdventure
             // Make sure _player has any required item for the new location
             if (!_player.HasRequiredItemToEnterThisLocation(newLocation))
             {
-                rtbMessages.Text += "You must have a " +
+                AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You must have a " +
                     newLocation.ItemRequiredToEnter.Name +
-                    " to enter this location." + Environment.NewLine;
+                    " to enter this location." + Environment.NewLine);
                 return;  // return without moving to the new location
             }
 
@@ -114,15 +114,15 @@ namespace SuperAdventure
 
                             // Give quest rewards
                             rtbMessages.Text += "You receive: " + Environment.NewLine;
-                            rtbMessages.Text +=
+                            rtbMessages.Text += 
                                 newLocation.QuestAvailableHere.RewardExperiencePoints.ToString() +
                                 " experience points" + Environment.NewLine;
-                            rtbMessages.Text +=
+                            rtbMessages.Text += 
                                 newLocation.QuestAvailableHere.RewardGold.ToString() +
                                 " gold" + Environment.NewLine;
-                            rtbMessages.Text +=
+                            AddTextToRichTextBoxAndScrollDown(rtbMessages, 
                                 newLocation.QuestAvailableHere.RewardItem.Name +
-                                Environment.NewLine;
+                                Environment.NewLine);
 
                             _player.ExperiencePoints +=
                                 newLocation.QuestAvailableHere.RewardExperiencePoints;
@@ -162,7 +162,7 @@ namespace SuperAdventure
                         }
                     }
 
-                    rtbMessages.Text += Environment.NewLine;
+                    AddTextToRichTextBoxAndScrollDown(rtbMessages,  Environment.NewLine);
 
                     // Add the quest to the player's quest list
                     _player.Quests.Add(new PlayerQuest(newLocation.QuestAvailableHere));
@@ -172,8 +172,8 @@ namespace SuperAdventure
             // Does the location have a monster?
             if (newLocation.MonsterLivingHere != null)
             {
-                rtbMessages.Text += "You see a " + newLocation.MonsterLivingHere.Name +
-                    Environment.NewLine;
+                AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You see a " + newLocation.MonsterLivingHere.Name +
+                    Environment.NewLine);
 
                 // Make a new monster, using the values from the standard monster
                 // in the World.Monster list
@@ -216,6 +216,24 @@ namespace SuperAdventure
 
             // Refresh player's potions combobox
             UpdatePotionListInUI();
+        }
+
+        /// <summary>
+        /// Add text to a target RichTextBox, then scroll to the bottom of that box
+        /// </summary>
+        /// <param name="rtb">RichTextBox form element that text will be added to</param>
+        /// <param name="textToAdd">Text string added to the bottom of the current 
+        /// text in [rtb]</param>
+        private void AddTextToRichTextBoxAndScrollDown(RichTextBox rtb, String textToAdd)
+        {
+            rtb.Text += textToAdd;
+            ScrollToBottomOfRichTextBox(rtb);
+        }
+
+        private void ScrollToBottomOfRichTextBox(RichTextBox rtb)
+        {
+            rtb.SelectionStart = rtb.Text.Length;
+            rtb.ScrollToCaret();
         }
 
         private void UpdateInventoryListInUI()
@@ -326,7 +344,7 @@ namespace SuperAdventure
 
         private void btnUseWeapon_Click(object sender, EventArgs e)
         {
-            //rtbMessages.Text += "Trying to use your weapon." + Environment.NewLine;
+            //AddTextToRichTextBoxAndScrollDown(rtbMessages,  "Trying to use your weapon." + Environment.NewLine);
 
             // Get the currently selected weapon from the cboWeapons ComboBox
             Weapon currentWeapon = (Weapon)cboWeapons.SelectedItem;
@@ -339,27 +357,27 @@ namespace SuperAdventure
             _currentMonster.CurrentHitPoints -= damageToMonster;
 
             // Display message
-            rtbMessages.Text += "You hit the " + _currentMonster.Name + " for " +
-                damageToMonster.ToString() + " points." + Environment.NewLine;
+            AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You hit the " + _currentMonster.Name + " for " +
+                damageToMonster.ToString() + " points." + Environment.NewLine);
 
             // Check if the monster is dead
             if(_currentMonster.CurrentHitPoints <= 0)
             {
                 // Monster is dead
-                rtbMessages.Text += Environment.NewLine;
-                rtbMessages.Text += "You defeated the " + _currentMonster.Name +
-                    Environment.NewLine;
+                AddTextToRichTextBoxAndScrollDown(rtbMessages,  Environment.NewLine);
+                AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You defeated the " + _currentMonster.Name +
+                    Environment.NewLine);
 
                 // Give player experience points for killing the monster
                 _player.ExperiencePoints += _currentMonster.RewardExperiencePoints;
-                rtbMessages.Text += "You receive " +
+                AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You receive " +
                     _currentMonster.RewardExperiencePoints.ToString() +
-                    " experience points" + Environment.NewLine;
+                    " experience points" + Environment.NewLine);
 
                 // Give player gold for killing the monster
                 _player.Gold += _currentMonster.RewardGold;
-                rtbMessages.Text += "You receive " +
-                    _currentMonster.RewardGold.ToString() + " gold" + Environment.NewLine;
+                AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You receive " +
+                    _currentMonster.RewardGold.ToString() + " gold" + Environment.NewLine);
 
                 // Get random loot items from the monster
                 List<InventoryItem> lootedItems = new List<InventoryItem>();
@@ -393,15 +411,15 @@ namespace SuperAdventure
 
                     if(inventoryItem.Quantity == 1)
                     {
-                        rtbMessages.Text += "You loot " +
+                        AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You loot " +
                             inventoryItem.Quantity.ToString() + " " +
-                            inventoryItem.Details.Name + Environment.NewLine;
+                            inventoryItem.Details.Name + Environment.NewLine);
                     }
                     else
                     {
-                        rtbMessages.Text += "You loot " +
+                        AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You loot " +
                             inventoryItem.Quantity.ToString() + " " +
-                            inventoryItem.Details.NamePlural + Environment.NewLine;
+                            inventoryItem.Details.NamePlural + Environment.NewLine);
                     }
                 }
 
@@ -416,7 +434,7 @@ namespace SuperAdventure
                 UpdatePotionListInUI();
 
                 // Add a blank line to the messages box, just for appearance
-                rtbMessages.Text += Environment.NewLine;
+                AddTextToRichTextBoxAndScrollDown(rtbMessages,  Environment.NewLine);
 
                 // Move player to current location (to heal player and
                 // create a new monster to fight)
@@ -429,8 +447,8 @@ namespace SuperAdventure
                     RandomNumberGenerator.NumberBetween(0, _currentMonster.MaximumDamage);
 
                 // Display message
-                rtbMessages.Text += "The " + _currentMonster.Name + " did " +
-                    damageToPlayer.ToString() + " points of damage." + Environment.NewLine;
+                AddTextToRichTextBoxAndScrollDown(rtbMessages,  "The " + _currentMonster.Name + " did " +
+                    damageToPlayer.ToString() + " points of damage." + Environment.NewLine);
 
                 // Subtract damage from player
                 _player.CurrentHitPoints -= damageToPlayer;
@@ -441,8 +459,8 @@ namespace SuperAdventure
                 if(_player.CurrentHitPoints <= 0)
                 {
                     // Display message
-                    rtbMessages.Text += "The " + _currentMonster.Name + " killed you." +
-                        Environment.NewLine;
+                    AddTextToRichTextBoxAndScrollDown(rtbMessages,  "The " + _currentMonster.Name + " killed you." +
+                        Environment.NewLine);
 
                     // Move player to "Home"
                     MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
@@ -452,7 +470,7 @@ namespace SuperAdventure
 
         private void btnUsePotion_Click(object sender, EventArgs e)
         {
-            // rtbMessages.Text += "Trying to use your potion." + Environment.NewLine;
+            // AddTextToRichTextBoxAndScrollDown(rtbMessages,  "Trying to use your potion." + Environment.NewLine);
 
             // Get the currently selected potion from the combobox
             HealingPotion potion = (HealingPotion)cboPotions.SelectedItem;
@@ -477,7 +495,7 @@ namespace SuperAdventure
             }
 
             // Display message
-            rtbMessages.Text += "You drink a " + potion.Name + Environment.NewLine;
+            AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You drink a " + potion.Name + Environment.NewLine);
 
             // Monster gets their turn to attack
 
@@ -486,8 +504,8 @@ namespace SuperAdventure
                 RandomNumberGenerator.NumberBetween(0, _currentMonster.MaximumDamage);
 
             // Display message
-            rtbMessages.Text += "The " + _currentMonster.Name + " did " +
-                damageToPlayer.ToString() + " points of damage." + Environment.NewLine;
+            AddTextToRichTextBoxAndScrollDown(rtbMessages,  "The " + _currentMonster.Name + " did " +
+                damageToPlayer.ToString() + " points of damage." + Environment.NewLine);
 
             // Subtract damage from player
             _player.CurrentHitPoints -= damageToPlayer;
@@ -495,8 +513,8 @@ namespace SuperAdventure
             if(_player.CurrentHitPoints <= 0)
             {
                 // Display message
-                rtbMessages.Text += "The " + _currentMonster.Name + " killed you." +
-                    Environment.NewLine;
+                AddTextToRichTextBoxAndScrollDown(rtbMessages,  "The " + _currentMonster.Name + " killed you." +
+                    Environment.NewLine);
 
                 // Move player to "Home"
                 MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
