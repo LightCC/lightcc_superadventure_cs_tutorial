@@ -20,7 +20,7 @@ namespace SuperAdventure
         {
             InitializeComponent();
 
-            _player = new Player(20, 0, /*1,*/ 10, 10);
+            _player = new Player(20, 0, 10, 10);
             MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
             _player.Inventory.Add(new InventoryItem(
                 World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));

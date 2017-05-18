@@ -21,14 +21,12 @@ namespace Engine
         public List<PlayerQuest> Quests { get; set; }
         public Location CurrentLocation { get; set; }
         
-        public Player(int gold, int experiencePoints, /*int level,*/
+        public Player(int gold, int experiencePoints, 
             int currentHitPoints, int maximumHitPoints)
             : base(currentHitPoints, maximumHitPoints)
         {
             Gold = gold;
             ExperiencePoints = experiencePoints;
-            // Removed when Level became auto-updating
-            //Level = level;
             Inventory = new List<InventoryItem>();
             Quests = new List<PlayerQuest>();
         }
