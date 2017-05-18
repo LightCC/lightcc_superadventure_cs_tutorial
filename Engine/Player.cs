@@ -10,18 +10,25 @@ namespace Engine
     {
         public int Gold { get; set; }
         public int ExperiencePoints { get; set; }
-        public int Level { get; set; }
+        public int Level
+        {
+            // Level will always increase after 100 XP are gained
+            // It is auto-calculated when read
+            // i.e. 0 xp = level 1, 100 = level 2, 1000 = level 10, etc.
+            get { return ((ExperiencePoints / 100) + 1); }
+        }
         public List<InventoryItem> Inventory { get; set; }
         public List<PlayerQuest> Quests { get; set; }
         public Location CurrentLocation { get; set; }
         
-        public Player(int gold, int experiencePoints, int level,
+        public Player(int gold, int experiencePoints, /*int level,*/
             int currentHitPoints, int maximumHitPoints)
             : base(currentHitPoints, maximumHitPoints)
         {
             Gold = gold;
             ExperiencePoints = experiencePoints;
-            Level = level;
+            // Removed when Level became auto-updating
+            //Level = level;
             Inventory = new List<InventoryItem>();
             Quests = new List<PlayerQuest>();
         }
