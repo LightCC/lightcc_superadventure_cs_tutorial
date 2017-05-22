@@ -39,16 +39,6 @@ namespace Engine
             return player;
         }
 
-        //public Player(int gold, int experiencePoints, 
-        //    int currentHitPoints, int maximumHitPoints)
-        //    : base(currentHitPoints, maximumHitPoints)
-        //{
-        //    Gold = gold;
-        //    ExperiencePoints = experiencePoints;
-        //    Inventory = new List<InventoryItem>();
-        //    Quests = new List<PlayerQuest>();
-        //}
-
         public bool HasRequiredItemToEnterThisLocation(Location location)
         {
             if (location.ItemRequiredToEnter == null)

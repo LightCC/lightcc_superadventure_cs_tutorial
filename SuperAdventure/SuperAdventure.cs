@@ -36,6 +36,16 @@ namespace SuperAdventure
             UpdatePlayerStats();
         }
 
+        private void btnCreateNewPlayer_Click(object sender, EventArgs e)
+        {
+            _player = Player.CreateDefaultPlayer();
+
+            // Clean-up interface after creating a new player
+            MoveTo(_player.CurrentLocation);
+            UpdatePlayerStats();
+            rtbMessages.Clear(); // clear messages text box
+        }
+
         private void UpdatePlayerStats()
         {
             // Refresh player information and inventory controls

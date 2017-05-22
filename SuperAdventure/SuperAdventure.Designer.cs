@@ -49,6 +49,7 @@
             this.rtbMessages = new System.Windows.Forms.RichTextBox();
             this.dgvInventory = new System.Windows.Forms.DataGridView();
             this.dgvQuests = new System.Windows.Forms.DataGridView();
+            this.btnCreateNewPlayer = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvInventory)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvQuests)).BeginInit();
             this.SuspendLayout();
@@ -256,11 +257,22 @@
             this.dgvQuests.Size = new System.Drawing.Size(312, 189);
             this.dgvQuests.TabIndex = 20;
             // 
+            // btnCreateNewPlayer
+            // 
+            this.btnCreateNewPlayer.Location = new System.Drawing.Point(369, 620);
+            this.btnCreateNewPlayer.Name = "btnCreateNewPlayer";
+            this.btnCreateNewPlayer.Size = new System.Drawing.Size(86, 25);
+            this.btnCreateNewPlayer.TabIndex = 21;
+            this.btnCreateNewPlayer.Text = "New Player";
+            this.btnCreateNewPlayer.UseVisualStyleBackColor = true;
+            this.btnCreateNewPlayer.Click += new System.EventHandler(this.btnCreateNewPlayer_Click);
+            // 
             // SuperAdventure
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(719, 651);
+            this.Controls.Add(this.btnCreateNewPlayer);
             this.Controls.Add(this.dgvQuests);
             this.Controls.Add(this.dgvInventory);
             this.Controls.Add(this.rtbMessages);
@@ -315,6 +327,7 @@
         private System.Windows.Forms.RichTextBox rtbMessages;
         private System.Windows.Forms.DataGridView dgvInventory;
         private System.Windows.Forms.DataGridView dgvQuests;
+        private System.Windows.Forms.Button btnCreateNewPlayer;
     }
 }
 
