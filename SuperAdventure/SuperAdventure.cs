@@ -317,20 +317,35 @@ namespace SuperAdventure
                         weapons.Add((Weapon)inventoryItem.Details);
                     }
                 }
+            }
 
-                if (weapons.Count == 0)
+            if (weapons.Count == 0)
+            {
+                // The player has no weapons, so hide the weapon combobox and the "Use" button
+                cboWeapons.Visible = false;
+                btnUseWeapon.Visible = false;
+            }
+            else // the player has > 0 weapons
+            {
+                // Remove the function that would cause the index to be saved
+                // to .CurrentWeapon when the DataSource is connected
+                cboWeapons.SelectedIndexChanged -= cboWeapons_SelectedIndexChanged; 
+                cboWeapons.DataSource = weapons;
+                // After setting the DataSource, add the function back in so that
+                // if the player changes the index, it will be saved
+                cboWeapons.SelectedIndexChanged += cboWeapons_SelectedIndexChanged;
+                cboWeapons.DisplayMember = "Name";
+                cboWeapons.ValueMember = "ID";
+
+                //cboWeapons.Visible = true;
+                //btnUseWeapon.Visible = true;
+
+                if (_player.CurrentWeapon != null)
                 {
-                    // The player has no weapons, so hide the weapon combobox
-                    // and the "Use" button
-                    cboWeapons.Visible = false;
-                    btnUseWeapon.Visible = false;
+                    cboWeapons.SelectedItem = _player.CurrentWeapon;
                 }
-                else // the player has > 0 weapons
+                else
                 {
-                    cboWeapons.DataSource = weapons;
-                    cboWeapons.DisplayMember = "Name";
-                    cboWeapons.ValueMember = "ID";
-
                     cboWeapons.SelectedIndex = 0;
                 }
             }
@@ -492,28 +507,20 @@ namespace SuperAdventure
 
         private void btnUsePotion_Click(object sender, EventArgs e)
         {
-            // AddTextToRichTextBoxAndScrollDown(rtbMessages,  "Trying to use your potion." + Environment.NewLine);
-
             // Get the currently selected potion from the combobox
             HealingPotion potion = (HealingPotion)cboPotions.SelectedItem;
 
-            // Add healing amount to the player's current hit points
             _player.CurrentHitPoints = (_player.CurrentHitPoints + potion.AmountToHeal);
-
-            // CurrentHitPoints cannot exceed player's MaximumHitPoints
             if(_player.CurrentHitPoints > _player.MaximumHitPoints)
             {
                 _player.CurrentHitPoints = _player.MaximumHitPoints;
             }
 
-            // Remove the potion from the player's inventory
-            foreach (InventoryItem ii in _player.Inventory)
+            // The potion exists (it was in the combobox) so remove 1 from inventory
+            InventoryItem playerItemPotionMatch = _player.Inventory.SingleOrDefault(ii => ii.Details.ID == potion.ID);
+            if (playerItemPotionMatch != null)
             {
-                if(ii.Details.ID == potion.ID)
-                {
-                    ii.Quantity--;
-                    break;
-                }
+                playerItemPotionMatch.Quantity--;
             }
 
             // Display message
@@ -548,9 +555,15 @@ namespace SuperAdventure
             UpdatePotionListInUI();
         }
 
+        private void cboWeapons_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _player.CurrentWeapon = (Weapon)cboWeapons.SelectedItem;
+        }
+
         private void SuperAdventure_FormClosing(object sender, FormClosingEventArgs e)
         {
             File.WriteAllText(PLAYER_DATA_FILE_NAME, _player.ToXmlString());
         }
+
     }
 }
