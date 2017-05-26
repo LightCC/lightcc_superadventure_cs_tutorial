@@ -22,6 +22,7 @@ namespace Engine
                 OnPropertyChanged("Gold");
             }
         }
+
         public int ExperiencePoints
         {
             get { return _experiencePoints; }
@@ -39,7 +40,7 @@ namespace Engine
             get { return ((ExperiencePoints / 100) + 1); }
         }
         public BindingList<InventoryItem> Inventory { get; set; }
-        public List<PlayerQuest> Quests { get; set; }
+        public BindingList<PlayerQuest> Quests { get; set; }
         public Location CurrentLocation { get; set; }
         public Weapon CurrentWeapon { get; set; }
 
@@ -50,7 +51,7 @@ namespace Engine
             ExperiencePoints = experiencePoints;
 
             Inventory = new BindingList<InventoryItem>();
-            Quests = new List<PlayerQuest>();
+            Quests = new BindingList<PlayerQuest>();
         }
 
         public static Player CreateDefaultPlayer()
@@ -149,12 +150,12 @@ namespace Engine
 
         public bool HasThisQuest(Quest questToCheck)
         {
-            return Quests.Exists(playerQuest => playerQuest.Details.ID == questToCheck.ID);
+            return Quests.Any(playerQuest => playerQuest.Details.ID == questToCheck.ID);
         }
 
         public bool CompletedThisQuest(Quest questToCheck)
         {
-            return Quests.Exists(playerQuest => (playerQuest.Details.ID == questToCheck.ID)
+            return Quests.Any(playerQuest => (playerQuest.Details.ID == questToCheck.ID)
                 && playerQuest.IsCompleted);
         }
 

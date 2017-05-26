@@ -33,6 +33,7 @@ namespace SuperAdventure
             }
             BindPlayerStatsToLabels(_player);
             BindInventoryToGrid(_player.Inventory);
+            BindQuestsToGrid(_player.Quests);
         
             MoveTo(_player.CurrentLocation);
         }
@@ -64,16 +65,36 @@ namespace SuperAdventure
                     HeaderText = "Name",
                     Width = 197,
                     DataPropertyName = "Description"
-                }
-            );
+                });
             dgvInventory.Columns.Add(new DataGridViewTextBoxColumn
                 {
                     HeaderText = "Quantity",
                     DataPropertyName = "Quantity"
-                }
-            );
+                });
         }
-        
+
+        private void BindQuestsToGrid(BindingList<PlayerQuest> quest)
+        {
+            // Clear all columns if anything is already setup
+            dgvQuests.Columns.Clear();
+
+            // Setup the view, bind the data source, and add the columns.
+            dgvQuests.RowHeadersVisible = false;
+            dgvQuests.AutoGenerateColumns = false;
+            dgvQuests.DataSource = quest;
+            dgvQuests.Columns.Add(new DataGridViewTextBoxColumn
+                {
+                    HeaderText = "Name",
+                    Width = 197,
+                    DataPropertyName = "Name"
+                });
+            dgvQuests.Columns.Add(new DataGridViewTextBoxColumn
+                {
+                    HeaderText = "Done?",
+                    DataPropertyName = "IsCompleted"
+                });
+        }
+
         private void btnCreateNewPlayer_Click(object sender, EventArgs e)
         {
             _player = Player.CreateDefaultPlayer();
@@ -81,6 +102,7 @@ namespace SuperAdventure
             // Bind UI Elements to the new player object
             BindPlayerStatsToLabels(_player);
             BindInventoryToGrid(_player.Inventory);
+            BindQuestsToGrid(_player.Quests);
 
             // Clean-up interface after creating a new player
             MoveTo(_player.CurrentLocation);
@@ -261,9 +283,6 @@ namespace SuperAdventure
                 btnUsePotion.Visible = false;
             }
 
-            // Refresh the player's quest list
-            UpdateQuestListInUI();
-
             // Refresh player's weapons combobox
             UpdateWeaponListInUI();
 
@@ -289,26 +308,7 @@ namespace SuperAdventure
             rtb.ScrollToCaret();
         }
 
-        private void UpdateQuestListInUI()
-        {
-            // Refresh player's quest list
-            dgvQuests.RowHeadersVisible = false;
-
-            dgvQuests.ColumnCount = 2;
-            dgvQuests.Columns[0].Name = "Name";
-            dgvQuests.Columns[0].Width = 197;
-            dgvQuests.Columns[1].Name = "Done?";
-
-            dgvQuests.Rows.Clear();
-
-            foreach (PlayerQuest playerQuest in _player.Quests)
-            {
-                dgvQuests.Rows.Add(new[] { playerQuest.Details.Name,
-                    playerQuest.IsCompleted.ToString() });
-            }
-        }
-
-        private void UpdateWeaponListInUI()
+       private void UpdateWeaponListInUI()
         {
             // Refresh player's weapons combobox
             List<Weapon> weapons = new List<Weapon>();
@@ -341,9 +341,6 @@ namespace SuperAdventure
                 cboWeapons.SelectedIndexChanged += cboWeapons_SelectedIndexChanged;
                 cboWeapons.DisplayMember = "Name";
                 cboWeapons.ValueMember = "ID";
-
-                //cboWeapons.Visible = true;
-                //btnUseWeapon.Visible = true;
 
                 if (_player.CurrentWeapon != null)
                 {
@@ -470,8 +467,6 @@ namespace SuperAdventure
                     }
                 }
 
-                //UpdatePlayerStats();
-                //UpdateInventoryListInUI();
                 UpdateWeaponListInUI();
                 UpdatePotionListInUI();
 
@@ -555,8 +550,7 @@ namespace SuperAdventure
             }
 
             // Refresh player data in UI
-            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-            //UpdateInventoryListInUI();
+            //lblHitPoints.Text = _player.CurrentHitPoints.ToString();
             UpdatePotionListInUI();
         }
 

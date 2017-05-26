@@ -52,8 +52,7 @@ namespace Engine
         {
             if(PropertyChanged != null)
             {
-                PropertyChanged(
-                    this, new PropertyChangedEventArgs(name));
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
         }
 
