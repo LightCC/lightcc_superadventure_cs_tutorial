@@ -32,9 +32,9 @@ namespace SuperAdventure
                 _player = Player.CreateDefaultPlayer();
             }
             BindPlayerStatsToLabels(_player);
-
+            BindInventoryToGrid(_player.Inventory);
+        
             MoveTo(_player.CurrentLocation);
-            //UpdatePlayerStats();
         }
 
         private void BindPlayerStatsToLabels(Player player)
@@ -50,25 +50,42 @@ namespace SuperAdventure
             lblLevel.DataBindings.Add("Text", player, "Level");
         }
 
+        private void BindInventoryToGrid(BindingList<InventoryItem> inventory)
+        {
+            // Clear all columns if anything is already setup
+            dgvInventory.Columns.Clear();
+
+            // Setup the view, bind the data source, and add the columns.
+            dgvInventory.RowHeadersVisible = false;
+            dgvInventory.AutoGenerateColumns = false;
+            dgvInventory.DataSource = inventory;
+            dgvInventory.Columns.Add(new DataGridViewTextBoxColumn
+                {
+                    HeaderText = "Name",
+                    Width = 197,
+                    DataPropertyName = "Description"
+                }
+            );
+            dgvInventory.Columns.Add(new DataGridViewTextBoxColumn
+                {
+                    HeaderText = "Quantity",
+                    DataPropertyName = "Quantity"
+                }
+            );
+        }
+        
         private void btnCreateNewPlayer_Click(object sender, EventArgs e)
         {
             _player = Player.CreateDefaultPlayer();
+
+            // Bind UI Elements to the new player object
             BindPlayerStatsToLabels(_player);
+            BindInventoryToGrid(_player.Inventory);
 
             // Clean-up interface after creating a new player
             MoveTo(_player.CurrentLocation);
-            //UpdatePlayerStats();
             rtbMessages.Clear(); // clear messages text box
         }
-
-        //private void UpdatePlayerStats()
-        //{
-        //    // Refresh player information and inventory controls
-        //    lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-        //    lblGold.Text = _player.Gold.ToString();
-        //    lblExperience.Text = _player.ExperiencePoints.ToString();
-        //    lblLevel.Text = _player.Level.ToString();
-        //}
 
         private void btnNorth_Click(object sender, EventArgs e)
         {
@@ -244,12 +261,6 @@ namespace SuperAdventure
                 btnUsePotion.Visible = false;
             }
 
-            // Refresh the player's stats
-            //UpdatePlayerStats();
-
-            // Refresh the player's inventory list
-            UpdateInventoryListInUI();
-
             // Refresh the player's quest list
             UpdateQuestListInUI();
 
@@ -276,27 +287,6 @@ namespace SuperAdventure
         {
             rtb.SelectionStart = rtb.Text.Length;
             rtb.ScrollToCaret();
-        }
-
-        private void UpdateInventoryListInUI()
-        {
-            dgvInventory.RowHeadersVisible = false;
-
-            dgvInventory.ColumnCount = 2;
-            dgvInventory.Columns[0].Name = "Name";
-            dgvInventory.Columns[0].Width = 197;
-            dgvInventory.Columns[1].Name = "Quantity";
-
-            dgvInventory.Rows.Clear();
-
-            foreach (InventoryItem inventoryItem in _player.Inventory)
-            {
-                if (inventoryItem.Quantity > 0)
-                {
-                    dgvInventory.Rows.Add(new[] { inventoryItem.Details.Name,
-                        inventoryItem.Quantity.ToString() });
-                }
-            }
         }
 
         private void UpdateQuestListInUI()
@@ -481,7 +471,7 @@ namespace SuperAdventure
                 }
 
                 //UpdatePlayerStats();
-                UpdateInventoryListInUI();
+                //UpdateInventoryListInUI();
                 UpdateWeaponListInUI();
                 UpdatePotionListInUI();
 
@@ -566,7 +556,7 @@ namespace SuperAdventure
 
             // Refresh player data in UI
             lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-            UpdateInventoryListInUI();
+            //UpdateInventoryListInUI();
             UpdatePotionListInUI();
         }
 
