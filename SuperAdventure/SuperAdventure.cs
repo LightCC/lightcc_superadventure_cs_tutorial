@@ -31,29 +31,44 @@ namespace SuperAdventure
             {
                 _player = Player.CreateDefaultPlayer();
             }
+            BindPlayerStatsToLabels(_player);
 
             MoveTo(_player.CurrentLocation);
-            UpdatePlayerStats();
+            //UpdatePlayerStats();
+        }
+
+        private void BindPlayerStatsToLabels(Player player)
+        {
+            lblHitPoints.DataBindings.Clear();
+            lblGold.DataBindings.Clear();
+            lblExperience.DataBindings.Clear();
+            lblLevel.DataBindings.Clear();
+
+            lblHitPoints.DataBindings.Add("Text", player, "CurrentHitPoints");
+            lblGold.DataBindings.Add("Text", player, "Gold");
+            lblExperience.DataBindings.Add("Text", player, "ExperiencePoints");
+            lblLevel.DataBindings.Add("Text", player, "Level");
         }
 
         private void btnCreateNewPlayer_Click(object sender, EventArgs e)
         {
             _player = Player.CreateDefaultPlayer();
+            BindPlayerStatsToLabels(_player);
 
             // Clean-up interface after creating a new player
             MoveTo(_player.CurrentLocation);
-            UpdatePlayerStats();
+            //UpdatePlayerStats();
             rtbMessages.Clear(); // clear messages text box
         }
 
-        private void UpdatePlayerStats()
-        {
-            // Refresh player information and inventory controls
-            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-            lblGold.Text = _player.Gold.ToString();
-            lblExperience.Text = _player.ExperiencePoints.ToString();
-            lblLevel.Text = _player.Level.ToString();
-        }
+        //private void UpdatePlayerStats()
+        //{
+        //    // Refresh player information and inventory controls
+        //    lblHitPoints.Text = _player.CurrentHitPoints.ToString();
+        //    lblGold.Text = _player.Gold.ToString();
+        //    lblExperience.Text = _player.ExperiencePoints.ToString();
+        //    lblLevel.Text = _player.Level.ToString();
+        //}
 
         private void btnNorth_Click(object sender, EventArgs e)
         {
@@ -230,7 +245,7 @@ namespace SuperAdventure
             }
 
             // Refresh the player's stats
-            UpdatePlayerStats();
+            //UpdatePlayerStats();
 
             // Refresh the player's inventory list
             UpdateInventoryListInUI();
@@ -465,7 +480,7 @@ namespace SuperAdventure
                     }
                 }
 
-                UpdatePlayerStats();
+                //UpdatePlayerStats();
                 UpdateInventoryListInUI();
                 UpdateWeaponListInUI();
                 UpdatePotionListInUI();
