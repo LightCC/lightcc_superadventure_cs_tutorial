@@ -222,7 +222,7 @@ private void MoveTo(Location newLocation)
 
             // Completely heal the player
             _player.CurrentHitPoints = _player.MaximumHitPoints;
-            lblHitPoints.Text = _player.CurrentHitPoints.ToString();
+            //lblHitPoints.Text = _player.CurrentHitPoints.ToString();
 
             // Does the location have a quest?
             if (newLocation.QuestAvailableHere != null)
@@ -350,10 +350,10 @@ private void MoveTo(Location newLocation)
             }
 
             // Refresh player's weapons combobox
-            UpdateWeaponListInUI();
+            //UpdateWeaponListInUI();
 
             // Refresh player's potions combobox
-            UpdatePotionListInUI();
+            //UpdatePotionListInUI();
         }
 
         /// <summary>
@@ -374,83 +374,83 @@ private void MoveTo(Location newLocation)
             rtb.ScrollToCaret();
         }
 
-       private void UpdateWeaponListInUI()
-        {
-            // Refresh player's weapons combobox
-            List<Weapon> weapons = new List<Weapon>();
+        //private void UpdateWeaponListInUI()
+        //{
+        //    // Refresh player's weapons combobox
+        //    List<Weapon> weapons = new List<Weapon>();
 
-            foreach (InventoryItem inventoryItem in _player.Inventory)
-            {
-                if (inventoryItem.Details is Weapon)
-                {
-                    if (inventoryItem.Quantity > 0)
-                    {
-                        weapons.Add((Weapon)inventoryItem.Details);
-                    }
-                }
-            }
+        //    foreach (InventoryItem inventoryItem in _player.Inventory)
+        //    {
+        //        if (inventoryItem.Details is Weapon)
+        //        {
+        //            if (inventoryItem.Quantity > 0)
+        //            {
+        //                weapons.Add((Weapon)inventoryItem.Details);
+        //            }
+        //        }
+        //    }
 
-            if (weapons.Count == 0)
-            {
-                // The player has no weapons, so hide the weapon combobox and the "Use" button
-                cboWeapons.Visible = false;
-                btnUseWeapon.Visible = false;
-            }
-            else // the player has > 0 weapons
-            {
-                // Remove the function that would cause the index to be saved
-                // to .CurrentWeapon when the DataSource is connected
-                cboWeapons.SelectedIndexChanged -= cboWeapons_SelectedIndexChanged; 
-                cboWeapons.DataSource = weapons;
-                // After setting the DataSource, add the function back in so that
-                // if the player changes the index, it will be saved
-                cboWeapons.SelectedIndexChanged += cboWeapons_SelectedIndexChanged;
-                cboWeapons.DisplayMember = "Name";
-                cboWeapons.ValueMember = "ID";
+        //    if (weapons.Count == 0)
+        //    {
+        //        // The player has no weapons, so hide the weapon combobox and the "Use" button
+        //        cboWeapons.Visible = false;
+        //        btnUseWeapon.Visible = false;
+        //    }
+        //    else // the player has > 0 weapons
+        //    {
+        //        // Remove the function that would cause the index to be saved
+        //        // to .CurrentWeapon when the DataSource is connected
+        //        cboWeapons.SelectedIndexChanged -= cboWeapons_SelectedIndexChanged; 
+        //        cboWeapons.DataSource = weapons;
+        //        // After setting the DataSource, add the function back in so that
+        //        // if the player changes the index, it will be saved
+        //        cboWeapons.SelectedIndexChanged += cboWeapons_SelectedIndexChanged;
+        //        cboWeapons.DisplayMember = "Name";
+        //        cboWeapons.ValueMember = "ID";
 
-                if (_player.CurrentWeapon != null)
-                {
-                    cboWeapons.SelectedItem = _player.CurrentWeapon;
-                }
-                else
-                {
-                    cboWeapons.SelectedIndex = 0;
-                }
-            }
-        }
+        //        if (_player.CurrentWeapon != null)
+        //        {
+        //            cboWeapons.SelectedItem = _player.CurrentWeapon;
+        //        }
+        //        else
+        //        {
+        //            cboWeapons.SelectedIndex = 0;
+        //        }
+        //    }
+        //}
 
-        private void UpdatePotionListInUI()
-        {
-            // Refresh player's potions combobox
-            List<HealingPotion> healingPotions = new List<HealingPotion>();
+        //private void UpdatePotionListInUI()
+        //{
+        //    // Refresh player's potions combobox
+        //    List<HealingPotion> healingPotions = new List<HealingPotion>();
 
-            foreach (InventoryItem inventoryItem2 in _player.Inventory)
-            {
-                if(inventoryItem2.Details is HealingPotion)
-                {
-                    if(inventoryItem2.Quantity > 0)
-                    {
-                        healingPotions.Add((HealingPotion) inventoryItem2.Details);
-                    }
-                }
-            }
+        //    foreach (InventoryItem inventoryItem2 in _player.Inventory)
+        //    {
+        //        if(inventoryItem2.Details is HealingPotion)
+        //        {
+        //            if(inventoryItem2.Quantity > 0)
+        //            {
+        //                healingPotions.Add((HealingPotion) inventoryItem2.Details);
+        //            }
+        //        }
+        //    }
 
-            if(healingPotions.Count == 0)
-            {
-                // The player doesn't have any potions, so hide the potion combobox
-                // and the "Use" button
-                cboPotions.Visible = false;
-                btnUsePotion.Visible = false;
-            }
-            else // the player has > 0 potions
-            {
-                cboPotions.DataSource = healingPotions;
-                cboPotions.DisplayMember = "Name";
-                cboPotions.ValueMember = "ID";
+        //    if(healingPotions.Count == 0)
+        //    {
+        //        // The player doesn't have any potions, so hide the potion combobox
+        //        // and the "Use" button
+        //        cboPotions.Visible = false;
+        //        btnUsePotion.Visible = false;
+        //    }
+        //    else // the player has > 0 potions
+        //    {
+        //        cboPotions.DataSource = healingPotions;
+        //        cboPotions.DisplayMember = "Name";
+        //        cboPotions.ValueMember = "ID";
 
-                cboPotions.SelectedIndex = 0;
-            }
-        }
+        //        cboPotions.SelectedIndex = 0;
+        //    }
+        //}
 
         private void btnUseWeapon_Click(object sender, EventArgs e)
         {
@@ -533,8 +533,8 @@ private void MoveTo(Location newLocation)
                     }
                 }
 
-                UpdateWeaponListInUI();
-                UpdatePotionListInUI();
+                //UpdateWeaponListInUI();
+                //UpdatePotionListInUI();
 
                 // Add a blank line to the messages box, just for appearance
                 AddTextToRichTextBoxAndScrollDown(rtbMessages,  Environment.NewLine);
@@ -613,7 +613,7 @@ private void MoveTo(Location newLocation)
 
             // Refresh player data in UI
             //lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-            UpdatePotionListInUI();
+            //UpdatePotionListInUI();
         }
 
         private void cboWeapons_SelectedIndexChanged(object sender, EventArgs e)
