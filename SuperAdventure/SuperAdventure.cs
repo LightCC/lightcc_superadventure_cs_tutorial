@@ -34,7 +34,12 @@ namespace SuperAdventure
             BindPlayerStatsToLabels(_player);
             BindInventoryToGrid(_player.Inventory);
             BindQuestsToGrid(_player.Quests);
-        
+
+           // _player.PropertyChanged -= PlayerOnPropertyChanged;
+            BindWeaponsToComboBox(_player.Weapons, _player.CurrentWeapon);
+            BindPotionsToComboBox(_player.Potions);
+            _player.PropertyChanged += PlayerOnPropertyChanged;
+
             MoveTo(_player.CurrentLocation);
         }
 
@@ -95,6 +100,39 @@ namespace SuperAdventure
                 });
         }
 
+        /// <summary>
+        /// When switching to a new active player, need to rebind the UI elements.
+        /// This rebinds the weapons list to the cboWeapons combobox
+        /// </summary>
+        /// <param name="weapons">The list of weapons to bind, for the player to select from</param>
+        /// <param name="currentWeapon">The current weapon in that list to show as selected</param>
+        private void BindWeaponsToComboBox(List<Weapon> weapons, Weapon currentWeapon = null)
+        {
+            //Remove the function that would cause the index to be saved
+            // to.CurrentWeapon when the DataSource is connected
+            cboWeapons.SelectedIndexChanged -= cboWeapons_SelectedIndexChanged;
+
+            cboWeapons.DataSource = weapons;
+            cboWeapons.DisplayMember = "Name";
+            cboWeapons.ValueMember = "Id";
+
+            if (currentWeapon != null)
+            {
+                cboWeapons.SelectedItem = currentWeapon;
+            }
+
+            //After setting the DataSource, and selecting any currentWeapon,
+            // add the function back in so that if the player changes the index, it will be saved
+            cboWeapons.SelectedIndexChanged += cboWeapons_SelectedIndexChanged;
+        }
+
+        private void BindPotionsToComboBox(List<HealingPotion> potions)
+        {
+            cboPotions.DataSource = _player.Potions;
+            cboPotions.DisplayMember = "Name";
+            cboPotions.ValueMember = "Id";
+        }
+
         private void btnCreateNewPlayer_Click(object sender, EventArgs e)
         {
             _player = Player.CreateDefaultPlayer();
@@ -103,10 +141,38 @@ namespace SuperAdventure
             BindPlayerStatsToLabels(_player);
             BindInventoryToGrid(_player.Inventory);
             BindQuestsToGrid(_player.Quests);
+            BindWeaponsToComboBox(_player.Weapons, _player.CurrentWeapon);
+            BindPotionsToComboBox(_player.Potions);
+            _player.PropertyChanged += PlayerOnPropertyChanged;
 
             // Clean-up interface after creating a new player
             MoveTo(_player.CurrentLocation);
             rtbMessages.Clear(); // clear messages text box
+        }
+
+        private void PlayerOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Weapons")
+            {
+                cboWeapons.DataSource = _player.Weapons;
+
+                if (!_player.Weapons.Any())
+                {
+                    cboWeapons.Visible = false;
+                    btnUseWeapon.Visible = false;
+                }
+            }
+
+            if (e.PropertyName == "Potions")
+            {
+                cboPotions.DataSource = _player.Potions;
+
+                if (!_player.Potions.Any())
+                {
+                    cboPotions.Visible = false;
+                    btnUsePotion.Visible = false;
+                }
+            }
         }
 
         private void btnNorth_Click(object sender, EventArgs e)
@@ -129,7 +195,7 @@ namespace SuperAdventure
             MoveTo(_player.CurrentLocation.LocationToWest);
         }
 
-        private void MoveTo(Location newLocation)
+private void MoveTo(Location newLocation)
         {
             // Make sure _player has any required item for the new location
             if (!_player.HasRequiredItemToEnterThisLocation(newLocation))
@@ -268,10 +334,10 @@ namespace SuperAdventure
                     _currentMonster.LootTable.Add(lootItem);
                 }
 
-                cboWeapons.Visible = true;
-                cboPotions.Visible = true;
-                btnUseWeapon.Visible = true;
-                btnUsePotion.Visible = true;
+                cboWeapons.Visible = _player.Weapons.Any();
+                cboPotions.Visible = _player.Potions.Any();
+                btnUseWeapon.Visible = _player.Weapons.Any();
+                btnUsePotion.Visible = _player.Potions.Any();
             }
             else // There is not a MonsterLivingHere
             {
@@ -517,11 +583,7 @@ namespace SuperAdventure
             }
 
             // The potion exists (it was in the combobox) so remove 1 from inventory
-            InventoryItem playerItemPotionMatch = _player.Inventory.SingleOrDefault(ii => ii.Details.ID == potion.ID);
-            if (playerItemPotionMatch != null)
-            {
-                playerItemPotionMatch.Quantity--;
-            }
+            _player.RemoveItemFromInventory(potion, 1);
 
             // Display message
             AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You drink a " + potion.Name + Environment.NewLine);

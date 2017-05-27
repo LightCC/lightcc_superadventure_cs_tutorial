@@ -54,6 +54,64 @@ namespace Engine
             Quests = new BindingList<PlayerQuest>();
         }
 
+        public List<Weapon> Weapons
+        {
+            get { return Inventory.Where(x => x.Details is Weapon).Select(
+                    x => x.Details as Weapon).ToList(); }
+        }
+
+        public List<HealingPotion> Potions
+        {
+            get { return Inventory.Where(x => x.Details is HealingPotion).Select(
+              x => x.Details as HealingPotion).ToList(); }
+        }
+
+        private void RaiseInventoryChangedEvent(Item item)
+        {
+            if(item is Weapon) { OnPropertyChanged("Weapons"); }
+            if(item is HealingPotion) { OnPropertyChanged("HealingPotion"); }
+        }
+
+        /// <summary>
+        /// Remove a quantity of an item from inventory.
+        /// If all the quantity of the item is removed, remove the entry from the inventory
+        /// If the item is not present, or has less than quantity, removed from list.
+        /// </summary>
+        /// <param name="itemtoRemove">An item currently in Inventory</param>
+        /// <param name="quantity">Default = 1; Amount of the item to remove</param>
+        public void RemoveItemFromInventory(Item itemtoRemove, int quantity = 1)
+        {
+            InventoryItem item = Inventory.SingleOrDefault(
+                ii => ii.Details.ID == itemtoRemove.ID);
+
+            if(item == null)
+            {
+                // The item is not in the player's inventory, so ignore it
+
+                // We might want to raise an error for this situation...
+            }
+            else
+            {
+                // They have the item in inventory
+                item.Quantity -= quantity;
+
+                // Don't allow negative quantities (might want an error here...)
+                if(item.Quantity < 0)
+                {
+                    item.Quantity = 0;
+                }
+
+                // if the quantity is zero, remove the item from the list
+                if(item.Quantity == 0)
+                {
+                    Inventory.Remove(item);
+                }
+
+                // Notify the UI that the inventory has changed
+                RaiseInventoryChangedEvent(itemtoRemove);
+            }
+        }
+
         public static Player CreateDefaultPlayer()
         {
             Player player = new Player(10, 10, 20, 0);
@@ -194,49 +252,41 @@ namespace Engine
         public void RemoveQuestCompletionItems(Quest quest)
         {
             //NOTE: if the player doesn't have the item, this will do nothing
-            //NOTE2: If the player doesn't have enough of the item... not sure - negative quantity?
             foreach (QuestCompletionItem qci in quest.QuestCompletionItems)
             {
+                // Subtract the quantity from the player's inventory that was needed to complete the quest
                 InventoryItem item = Inventory.SingleOrDefault(
                     ii => ii.Details.ID == qci.Details.ID);
 
                 if (item != null)  // Don't have to check for this if we know he has the item?
                 {
-                    // Subtract the quantity from the player's inventory that was needed to complete the quest
-                    item.Quantity -= qci.Quantity;
+                    RemoveItemFromInventory(item.Details, qci.Quantity);
                 }
             }
-        }
-
-        /// <summary>
-        /// Add a single item to inventory or increment the quantity of that item by 1
-        /// </summary>
-        /// <param name="itemToAdd">The Item that is being added to inventory in quantity of 1</param>
-        public void AddItemToInventory(Item itemToAdd)
-        {
-            AddItemToInventory(itemToAdd, 1);
         }
 
         /// <summary>
         /// Add 'quantity' of 'itemToAdd' to inventory, or increase existing quantity
         /// </summary>
         /// <param name="itemToAdd">Item to be added to inventory (can already be in inventory)</param>
-        /// <param name="quantity">Amount of item to be added</param>
-        public void AddItemToInventory(Item itemToAdd, int quantity)
+        /// <param name="quantity">Amount of item to be added (Default = 1)</param>
+        public void AddItemToInventory(Item itemToAdd, int quantity = 1)
         {
             InventoryItem item = Inventory.SingleOrDefault(
                 ii => ii.Details.ID == itemToAdd.ID);
 
             if (item == null)
             {
-                // They didn't have the item, so add it to their inventory (qty 1)
+                // They didn't have the item, so add it to their inventory
                 Inventory.Add(new InventoryItem(itemToAdd, quantity));
             }
             else
             {
-                // They have the item in inventory, so just increment quantity
+                // They already have the item in inventory, so just increase quantity
                 item.Quantity += quantity;
             }
+
+            RaiseInventoryChangedEvent(itemToAdd);
         }
 
         // NOTE:  If the player does not have 'quest', this will do nothing
