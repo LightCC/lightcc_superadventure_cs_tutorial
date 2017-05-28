@@ -15,7 +15,6 @@ namespace SuperAdventure
     public partial class SuperAdventure : Form
     {
         private Player _player;
-        private Monster _currentMonster;
         private const string PLAYER_DATA_FILE_NAME = "PlayerData.xml";
 
         public SuperAdventure()
@@ -31,16 +30,36 @@ namespace SuperAdventure
             {
                 _player = Player.CreateDefaultPlayer();
             }
-            BindPlayerStatsToLabels(_player);
-            BindInventoryToGrid(_player.Inventory);
-            BindQuestsToGrid(_player.Quests);
 
-           // _player.PropertyChanged -= PlayerOnPropertyChanged;
-            BindWeaponsToComboBox(_player.Weapons, _player.CurrentWeapon);
-            BindPotionsToComboBox(_player.Potions);
-            _player.PropertyChanged += PlayerOnPropertyChanged;
+            BindUiElementsToNewPlayer(_player);
 
-            MoveTo(_player.CurrentLocation);
+            // Move to the player's location to reset UI/status of everything
+            _player.MoveTo(_player.CurrentLocation);
+        }
+
+        private void DisplayMessage(object sender, MessageEventArgs messageEventArgs)
+        {
+            rtbMessages.Text += messageEventArgs.Message + Environment.NewLine;
+
+            if (messageEventArgs.AddExtraNewLine)
+            {
+                rtbMessages.Text += Environment.NewLine;
+            }
+
+            rtbMessages.SelectionStart = rtbMessages.Text.Length;
+            rtbMessages.ScrollToCaret();
+        }
+
+        private void BindUiElementsToNewPlayer(Player player)
+        {
+            BindPlayerStatsToLabels(player);
+            BindInventoryToGrid(player.Inventory);
+            BindQuestsToGrid(player.Quests);
+            BindWeaponsToComboBox(player.Weapons, player.CurrentWeapon);
+            BindPotionsToComboBox(player.Potions);
+
+            player.PropertyChanged += PlayerOnPropertyChanged;
+            player.OnMessage += DisplayMessage;
         }
 
         private void BindPlayerStatsToLabels(Player player)
@@ -138,15 +157,10 @@ namespace SuperAdventure
             _player = Player.CreateDefaultPlayer();
 
             // Bind UI Elements to the new player object
-            BindPlayerStatsToLabels(_player);
-            BindInventoryToGrid(_player.Inventory);
-            BindQuestsToGrid(_player.Quests);
-            BindWeaponsToComboBox(_player.Weapons, _player.CurrentWeapon);
-            BindPotionsToComboBox(_player.Potions);
-            _player.PropertyChanged += PlayerOnPropertyChanged;
+            BindUiElementsToNewPlayer(_player);
 
             // Clean-up interface after creating a new player
-            MoveTo(_player.CurrentLocation);
+            _player.MoveTo(_player.CurrentLocation);
             rtbMessages.Clear(); // clear messages text box
         }
 
@@ -173,188 +187,59 @@ namespace SuperAdventure
                     btnUsePotion.Visible = false;
                 }
             }
+
+            if (e.PropertyName == "CurrentLocation")
+            {
+                // Show/hide available movement buttons
+                btnNorth.Visible = (_player.CurrentLocation.LocationToNorth != null);
+                btnEast.Visible = (_player.CurrentLocation.LocationToEast != null);
+                btnSouth.Visible = (_player.CurrentLocation.LocationToSouth != null);
+                btnWest.Visible = (_player.CurrentLocation.LocationToWest != null);
+
+                // Display current location name and description
+                rtbLocation.Text = _player.CurrentLocation.Name + Environment.NewLine;
+                rtbLocation.Text += _player.CurrentLocation.Description + Environment.NewLine;
+
+                if(_player.CurrentLocation.MonsterLivingHere == null)
+                {
+                    cboWeapons.Visible = false;
+                    cboPotions.Visible = false;
+                    btnUseWeapon.Visible = false;
+                    btnUsePotion.Visible = false;
+                }
+                else
+                {
+                    cboWeapons.Visible = _player.Weapons.Any();
+                    cboPotions.Visible = _player.Potions.Any();
+                    btnUseWeapon.Visible = _player.Weapons.Any();
+                    btnUsePotion.Visible = _player.Potions.Any();
+                }
+            }
         }
 
         private void btnNorth_Click(object sender, EventArgs e)
         {
-            MoveTo(_player.CurrentLocation.LocationToNorth);
+            _player.MoveNorth();
         }
 
         private void btnEast_Click(object sender, EventArgs e)
         {
-            MoveTo(_player.CurrentLocation.LocationToEast);
+            _player.MoveEast();
         }
 
         private void btnSouth_Click(object sender, EventArgs e)
         {
-            MoveTo(_player.CurrentLocation.LocationToSouth);
+            _player.MoveSouth();
         }
 
         private void btnWest_Click(object sender, EventArgs e)
         {
-            MoveTo(_player.CurrentLocation.LocationToWest);
+            _player.MoveWest();
         }
 
-private void MoveTo(Location newLocation)
+        /* private void MoveTo(Location newLocation)
         {
-            // Make sure _player has any required item for the new location
-            if (!_player.HasRequiredItemToEnterThisLocation(newLocation))
-            {
-                AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You must have a " +
-                    newLocation.ItemRequiredToEnter.Name +
-                    " to enter this location." + Environment.NewLine);
-                return;  // return without moving to the new location
-            }
-
-            // We have any required item, or there wasn't an item required,
-            // so update the player's current location
-            _player.CurrentLocation = newLocation;
-
-            // Show/Hide the available movement buttons
-            btnNorth.Visible = (newLocation.LocationToNorth != null);
-            btnEast.Visible = (newLocation.LocationToEast != null);
-            btnSouth.Visible = (newLocation.LocationToSouth != null);
-            btnWest.Visible = (newLocation.LocationToWest != null);
-
-            // Display current location name and description
-            rtbLocation.Text = newLocation.Name + Environment.NewLine;
-            rtbLocation.Text += newLocation.Description + Environment.NewLine;
-
-            // Completely heal the player
-            _player.CurrentHitPoints = _player.MaximumHitPoints;
-            //lblHitPoints.Text = _player.CurrentHitPoints.ToString();
-
-            // Does the location have a quest?
-            if (newLocation.QuestAvailableHere != null)
-            {
- 
-                bool playerAlreadyHasQuest =
-                    _player.HasThisQuest(newLocation.QuestAvailableHere);
-                bool playerAlreadyCompletedQuest =
-                    _player.CompletedThisQuest(newLocation.QuestAvailableHere);
-                
-                // See if the player already has the quest
-                if (playerAlreadyHasQuest)
-                {
-                    // If the player has not complete the quest yet
-                    if (!playerAlreadyCompletedQuest)
-                    {
-                        // See if the player has all the items
-                        // needed to complete the quest
-                        bool playerHasAllItemsToCompleteQuest =
-                            _player.HasAllQuestCompletionItems(newLocation.QuestAvailableHere);
-
-                        // The player has all items required to complete the quest
-                        if (playerHasAllItemsToCompleteQuest)
-                        {
-                            // Display message
-                            rtbMessages.Text += Environment.NewLine;
-                            rtbMessages.Text += "You complete the " +
-                                newLocation.QuestAvailableHere.Name +
-                                " quest." + Environment.NewLine;
-
-                            // Remove quest items from inventory
-                            _player.RemoveQuestCompletionItems(newLocation.QuestAvailableHere);    
-
-                            // Give quest rewards
-                            rtbMessages.Text += "You receive: " + Environment.NewLine;
-                            rtbMessages.Text += 
-                                newLocation.QuestAvailableHere.RewardExperiencePoints.ToString() +
-                                " experience points" + Environment.NewLine;
-                            rtbMessages.Text += 
-                                newLocation.QuestAvailableHere.RewardGold.ToString() +
-                                " gold" + Environment.NewLine;
-                            AddTextToRichTextBoxAndScrollDown(rtbMessages, 
-                                newLocation.QuestAvailableHere.RewardItem.Name +
-                                Environment.NewLine);
-
-                            _player.AddExperiencePoints(
-                                newLocation.QuestAvailableHere.RewardExperiencePoints);
-                            _player.Gold += newLocation.QuestAvailableHere.RewardGold;
-
-                            // Add the reward item to the player's inventory
-                            _player.AddItemToInventory(newLocation.QuestAvailableHere.RewardItem);
-
-                            // Mark the quest as completed
-                            _player.MarkQuestCompleted(newLocation.QuestAvailableHere);
-                        }
-                    }
-                }
-                else // !playerAlreadyHasQuest
-                {
-                    // The player does not already have the quest
-
-                    // Display the messages
-                    rtbMessages.Text += "You receive the " +
-                        newLocation.QuestAvailableHere.Name +
-                        " quest." + Environment.NewLine;
-                    rtbMessages.Text += newLocation.QuestAvailableHere.Description +
-                        Environment.NewLine;
-                    rtbMessages.Text += "To complete it, return with:" + Environment.NewLine;
-                    foreach (QuestCompletionItem qci in
-                        newLocation.QuestAvailableHere.QuestCompletionItems)
-                    {
-                        if (qci.Quantity == 1)
-                        {
-                            rtbMessages.Text += qci.Quantity.ToString() + " " +
-                                qci.Details.Name + Environment.NewLine;
-                        }
-                        else
-                        {
-                            rtbMessages.Text += qci.Quantity.ToString() + " " +
-                                qci.Details.NamePlural + Environment.NewLine;
-                        }
-                    }
-
-                    AddTextToRichTextBoxAndScrollDown(rtbMessages,  Environment.NewLine);
-
-                    // Add the quest to the player's quest list
-                    _player.Quests.Add(new PlayerQuest(newLocation.QuestAvailableHere));
-                } // end player has this quest / or not
-            } // end quest is available here
-
-            // Does the location have a monster?
-            if (newLocation.MonsterLivingHere != null)
-            {
-                AddTextToRichTextBoxAndScrollDown(rtbMessages,  "You see a " + newLocation.MonsterLivingHere.Name +
-                    Environment.NewLine);
-
-                // Make a new monster, using the values from the standard monster
-                // in the World.Monster list
-                Monster standardMonster = World.MonsterByID(
-                    newLocation.MonsterLivingHere.ID);
-
-                _currentMonster = new Monster(standardMonster.ID, standardMonster.Name,
-                    standardMonster.MaximumDamage, standardMonster.RewardExperiencePoints,
-                    standardMonster.RewardGold, standardMonster.CurrentHitPoints,
-                    standardMonster.MaximumHitPoints);
-
-                foreach (LootItem lootItem in standardMonster.LootTable)
-                {
-                    _currentMonster.LootTable.Add(lootItem);
-                }
-
-                cboWeapons.Visible = _player.Weapons.Any();
-                cboPotions.Visible = _player.Potions.Any();
-                btnUseWeapon.Visible = _player.Weapons.Any();
-                btnUsePotion.Visible = _player.Potions.Any();
-            }
-            else // There is not a MonsterLivingHere
-            {
-                _currentMonster = null;
-
-                cboWeapons.Visible = false;
-                cboPotions.Visible = false;
-                btnUseWeapon.Visible = false;
-                btnUsePotion.Visible = false;
-            }
-
-            // Refresh player's weapons combobox
-            //UpdateWeaponListInUI();
-
-            // Refresh player's potions combobox
-            //UpdatePotionListInUI();
-        }
+        } */
 
         /// <summary>
         /// Add text to a target RichTextBox, then scroll to the bottom of that box
@@ -362,17 +247,17 @@ private void MoveTo(Location newLocation)
         /// <param name="rtb">RichTextBox form element that text will be added to</param>
         /// <param name="textToAdd">Text string added to the bottom of the current 
         /// text in [rtb]</param>
-        private void AddTextToRichTextBoxAndScrollDown(RichTextBox rtb, String textToAdd)
-        {
-            rtb.Text += textToAdd;
-            ScrollToBottomOfRichTextBox(rtb);
-        }
+        //private void AddTextToRichTextBoxAndScrollDown(RichTextBox rtb, String textToAdd)
+        //{
+        //    rtb.Text += textToAdd;
+        //    ScrollToBottomOfRichTextBox(rtb);
+        //}
 
-        private void ScrollToBottomOfRichTextBox(RichTextBox rtb)
-        {
-            rtb.SelectionStart = rtb.Text.Length;
-            rtb.ScrollToCaret();
-        }
+        //private void ScrollToBottomOfRichTextBox(RichTextBox rtb)
+        //{
+        //    rtb.SelectionStart = rtb.Text.Length;
+        //    rtb.ScrollToCaret();
+        //}
 
         //private void UpdateWeaponListInUI()
         //{
@@ -453,6 +338,14 @@ private void MoveTo(Location newLocation)
         //}
 
         private void btnUseWeapon_Click(object sender, EventArgs e)
+        {
+            // Get the currently selected weapon from the cboWeapons ComboBox
+            Weapon currentWeapon = (Weapon)cboWeapons.SelectedItem;
+
+            _player.UseWeapon(currentWeapon);
+        }
+
+        /* private void btnUseWeapon_Click(object sender, EventArgs e)
         {
             //AddTextToRichTextBoxAndScrollDown(rtbMessages,  "Trying to use your weapon." + Environment.NewLine);
 
@@ -570,8 +463,17 @@ private void MoveTo(Location newLocation)
                 }
             }
         }
+        */
 
         private void btnUsePotion_Click(object sender, EventArgs e)
+        {
+            // Get currently selected potion from the combobox
+            HealingPotion potion = (HealingPotion)cboPotions.SelectedItem;
+
+            _player.UsePotion(potion);
+        }
+
+        /* private void btnUsePotion_Click(object sender, EventArgs e)
         {
             // Get the currently selected potion from the combobox
             HealingPotion potion = (HealingPotion)cboPotions.SelectedItem;
@@ -604,8 +506,8 @@ private void MoveTo(Location newLocation)
             if(_player.CurrentHitPoints <= 0)
             {
                 // Display message
-                AddTextToRichTextBoxAndScrollDown(rtbMessages,  "The " + _currentMonster.Name + " killed you." +
-                    Environment.NewLine);
+                AddTextToRichTextBoxAndScrollDown(rtbMessages,  "The " + _currentMonster.Name +
+                    " killed you." + Environment.NewLine);
 
                 // Move player to "Home"
                 MoveTo(World.LocationByID(World.LOCATION_ID_HOME));
@@ -615,8 +517,9 @@ private void MoveTo(Location newLocation)
             //lblHitPoints.Text = _player.CurrentHitPoints.ToString();
             //UpdatePotionListInUI();
         }
+        */
 
-        private void cboWeapons_SelectedIndexChanged(object sender, EventArgs e)
+            private void cboWeapons_SelectedIndexChanged(object sender, EventArgs e)
         {
             _player.CurrentWeapon = (Weapon)cboWeapons.SelectedItem;
         }
