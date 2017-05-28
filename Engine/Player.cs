@@ -103,7 +103,6 @@ namespace Engine
             if(item == null)
             {
                 // The item is not in the player's inventory, so ignore it
-
                 // We might want to raise an error for this situation...
             }
             else
@@ -308,15 +307,13 @@ namespace Engine
                 // See if the player already has the quest
                 if (playerAlreadyHasQuest)
                 {
-                    // If the player has not complete the quest yet
+                    // If the player has not completed the quest yet
                     if (!playerAlreadyCompletedQuest)
                     {
-                        // See if the player has all the items
-                        // needed to complete the quest
+                        // See if the player has all the items needed to complete the quest
                         bool playerHasAllItemsToCompleteQuest =
                             HasAllQuestCompletionItems(newLocation.QuestAvailableHere);
 
-                        // The player has all items required to complete the quest
                         if (playerHasAllItemsToCompleteQuest)
                         {
                             // Display message
@@ -334,9 +331,6 @@ namespace Engine
                             RaiseMessage(newLocation.QuestAvailableHere.RewardGold.ToString() +
                                 " gold");
                             RaiseMessage(newLocation.QuestAvailableHere.RewardItem.Name);
-                            //AddTextToRichTextBoxAndScrollDown(rtbMessages,
-                            //    newLocation.QuestAvailableHere.RewardItem.Name +
-                            //    Environment.NewLine);
 
                             AddExperiencePoints(
                                 newLocation.QuestAvailableHere.RewardExperiencePoints);
@@ -372,8 +366,6 @@ namespace Engine
                         }
                     }
 
-                    //AddTextToRichTextBoxAndScrollDown(rtbMessages, Environment.NewLine);
-
                     // Add the quest to the player's quest list
                     Quests.Add(new PlayerQuest(newLocation.QuestAvailableHere));
                 } // end player has this quest / or not
@@ -383,12 +375,10 @@ namespace Engine
             if (newLocation.MonsterLivingHere != null)
             {
                 RaiseMessage("You see a " + newLocation.MonsterLivingHere.Name);
-                //AddTextToRichTextBoxAndScrollDown(rtbMessages, "You see a " + newLocation.MonsterLivingHere.Name + Environment.NewLine);
 
                 // Make a new monster, using the values from the standard monster
                 // in the World.Monster list
-                Monster standardMonster = World.MonsterByID(
-                    newLocation.MonsterLivingHere.ID);
+                Monster standardMonster = World.MonsterByID(newLocation.MonsterLivingHere.ID);
 
                 _currentMonster = new Monster(standardMonster.ID, standardMonster.Name,
                     standardMonster.MaximumDamage, standardMonster.RewardExperiencePoints,
@@ -399,20 +389,10 @@ namespace Engine
                 {
                     _currentMonster.LootTable.Add(lootItem);
                 }
-
-                //cboWeapons.Visible = _player.Weapons.Any();
-                //cboPotions.Visible = _player.Potions.Any();
-                //btnUseWeapon.Visible = _player.Weapons.Any();
-                //btnUsePotion.Visible = _player.Potions.Any();
             }
             else // There is not a MonsterLivingHere
             {
                 _currentMonster = null;
-
-                //cboWeapons.Visible = false;
-                //cboPotions.Visible = false;
-                //btnUseWeapon.Visible = false;
-                //btnUsePotion.Visible = false;
             }
 
         }
@@ -559,6 +539,9 @@ namespace Engine
             }
         }
 
+        // Event to be used with RaiseMessage
+        // Bind a function from the UI meant to receive the messages
+        // to this EventHandler, it will be used/triggered in RaiseMessage
         public event EventHandler<MessageEventArgs> OnMessage;
 
         private void RaiseMessage(string message, bool addExtraNewLine = false)
