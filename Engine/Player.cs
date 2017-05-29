@@ -60,6 +60,8 @@ namespace Engine
 
         public Weapon CurrentWeapon { get; set; }
 
+        public HealingPotion CurrentPotion { get; set; }
+
         private Player(int currentHitPoints, int maximumHitPoints, int gold, int experiencePoints)
             : base(currentHitPoints, maximumHitPoints)
         {
@@ -218,7 +220,23 @@ namespace Engine
             if (item == null)
             {
                 // They didn't have the item, so add it to their inventory
+
+                // If there are none of this type of item, and it has a "CurrentItem"
+                // property, then set this to it, so indexing will work right
+                // NOTE: The UI code will follow-thru with the updates, based on
+                // RaiseInventoryChangedEvent and Player.PropertyChanged event
+                if (itemToAdd is Weapon && !Weapons.Any())
+                {
+                    CurrentWeapon = (Weapon)itemToAdd;
+                }
+
+                if (itemToAdd is HealingPotion && !Potions.Any() )
+                {
+                    CurrentPotion = (HealingPotion)itemToAdd;
+                }
+
                 Inventory.Add(new InventoryItem(itemToAdd, quantity));
+
             }
             else
             {
@@ -596,6 +614,13 @@ namespace Engine
                     player.CurrentWeapon = (Weapon)World.ItemByID(currentWeaponID);
                 }
 
+                if (playerData.SelectSingleNode("/Player/Stats/CurrentPotionID") != null)
+                {
+                    int currentPotionID = Convert.ToInt32(playerData.SelectSingleNode(
+                        "/Player/Stats/CurrentPotionID").InnerText);
+                    player.CurrentPotion = (HealingPotion)World.ItemByID(currentPotionID);
+                }
+
                 foreach (XmlNode node in playerData.SelectNodes(
                     "/Player/InventoryItems/InventoryItem"))
                 {
@@ -668,6 +693,14 @@ namespace Engine
                 currentWeaponID.AppendChild(playerData.CreateTextNode(
                     this.CurrentWeapon.ID.ToString()));
                 stats.AppendChild(currentWeaponID);
+            }
+
+            if (CurrentPotion != null)
+            {
+                XmlNode currentPotionID = playerData.CreateElement("CurrentPotionID");
+                currentPotionID.AppendChild(playerData.CreateTextNode(
+                    this.CurrentPotion.ID.ToString()));
+                stats.AppendChild(currentPotionID);
             }
 
             // Create the "InventoryItems" node

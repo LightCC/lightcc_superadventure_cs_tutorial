@@ -145,11 +145,24 @@ namespace SuperAdventure
             cboWeapons.SelectedIndexChanged += cboWeapons_SelectedIndexChanged;
         }
 
-        private void BindPotionsToComboBox(List<HealingPotion> potions)
+        private void BindPotionsToComboBox(List<HealingPotion> potions, HealingPotion currentPotion = null)
         {
+            // Remove the event that would cause the index to be saved
+            // to Player.CurrentPotion when the DataSource is connected
+            cboPotions.SelectedIndexChanged -= cboPotions_SelectedIndexChanged;
+
             cboPotions.DataSource = _player.Potions;
             cboPotions.DisplayMember = "Name";
             cboPotions.ValueMember = "Id";
+
+            if (currentPotion != null)
+            {
+                cboPotions.SelectedItem = currentPotion;
+            }
+
+            // After setting the DataSource, and selecting any Player.CurrentPotion,
+            // add the event handler back so that if the player changes the index, it will be saved
+            cboPotions.SelectedIndexChanged += cboPotions_SelectedIndexChanged;
         }
 
         private void btnCreateNewPlayer_Click(object sender, EventArgs e)
@@ -180,12 +193,15 @@ namespace SuperAdventure
             if (e.PropertyName == "Potions")
             {
                 cboPotions.DataSource = _player.Potions;
+                cboPotions.DisplayMember = "Name";
+                cboPotions.ValueMember = "ID";
 
                 if (!_player.Potions.Any())
                 {
                     cboPotions.Visible = false;
                     btnUsePotion.Visible = false;
                 }
+
             }
 
             if (e.PropertyName == "CurrentLocation")
@@ -256,6 +272,11 @@ namespace SuperAdventure
         private void cboWeapons_SelectedIndexChanged(object sender, EventArgs e)
         {
             _player.CurrentWeapon = (Weapon)cboWeapons.SelectedItem;
+        }
+
+        private void cboPotions_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _player.CurrentPotion = (HealingPotion)cboPotions.SelectedItem;
         }
 
         private void SuperAdventure_FormClosing(object sender, FormClosingEventArgs e)

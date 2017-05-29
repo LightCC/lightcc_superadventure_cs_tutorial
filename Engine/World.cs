@@ -19,10 +19,11 @@ namespace Engine
         public const int ITEM_ID_SNAKE_FANG = 4;
         public const int ITEM_ID_SNAKESKIN = 5;
         public const int ITEM_ID_CLUB = 6;
-        public const int ITEM_ID_HEALING_POTION = 7;
+        public const int ITEM_ID_MINOR_HEALING_POTION = 7;
         public const int ITEM_ID_SPIDER_FANG = 8;
         public const int ITEM_ID_SPIDER_SILK = 9;
         public const int ITEM_ID_ADVENTURER_PASS = 10;
+        public const int ITEM_ID_HEALING_POTION = 11;
 
         public const int MONSTER_ID_RAT = 1;
         public const int MONSTER_ID_SNAKE = 2;
@@ -51,16 +52,17 @@ namespace Engine
 
         private static void PopulateItems()
         {
-            Items.Add(new Weapon(ITEM_ID_RUSTY_SWORD, "Rusty sword", "Rusty swords", 0, 5));
-            Items.Add(new Item(ITEM_ID_RAT_TAIL, "Rat tail", "Rat tails"));
-            Items.Add(new Item(ITEM_ID_PIECE_OF_FUR, "Piece of fur", "Pieces of fur"));
-            Items.Add(new Item(ITEM_ID_SNAKE_FANG, "Snake fang", "Snake fangs"));
-            Items.Add(new Item(ITEM_ID_SNAKESKIN, "Snakeskin", "Snakeskins"));
-            Items.Add(new Weapon(ITEM_ID_CLUB, "Club", "Clubs", 3, 10));
-            Items.Add(new HealingPotion(ITEM_ID_HEALING_POTION, "Healing potion", "Healing potions", 5));
-            Items.Add(new Item(ITEM_ID_SPIDER_FANG, "Spider fang", "Spider fangs"));
-            Items.Add(new Item(ITEM_ID_SPIDER_SILK, "Spider silk", "Spider silks"));
-            Items.Add(new Item(ITEM_ID_ADVENTURER_PASS, "Adventurer pass", "Adventurer passes"));
+            Items.Add(new Weapon(ITEM_ID_RUSTY_SWORD, "Rusty sword", "Rusty swords", 0, 5, 5));
+            Items.Add(new Weapon(ITEM_ID_CLUB, "Club", "Clubs", 3, 10, 8));
+            Items.Add(new HealingPotion(ITEM_ID_MINOR_HEALING_POTION, "Minor Healing potion", "Minor Healing potions", 10, 3));
+            Items.Add(new HealingPotion(ITEM_ID_HEALING_POTION, "Healing potion", "Healing potions", 20, 10));
+            Items.Add(new Item(ITEM_ID_RAT_TAIL, "Rat tail", "Rat tails", 1));
+            Items.Add(new Item(ITEM_ID_PIECE_OF_FUR, "Piece of fur", "Pieces of fur", 1));
+            Items.Add(new Item(ITEM_ID_SNAKE_FANG, "Snake fang", "Snake fangs", 1));
+            Items.Add(new Item(ITEM_ID_SNAKESKIN, "Snakeskin", "Snakeskins", 2));
+            Items.Add(new Item(ITEM_ID_SPIDER_FANG, "Spider fang", "Spider fangs", 1));
+            Items.Add(new Item(ITEM_ID_SPIDER_SILK, "Spider silk", "Spider silks", 1));
+            Items.Add(new Item(ITEM_ID_ADVENTURER_PASS, "Adventurer pass", "Adventurer passes", -1));
         }
 
         private static void PopulateMonsters()
@@ -88,12 +90,12 @@ namespace Engine
             Quest clearAlchemistGarden = new Quest(QUEST_ID_CLEAR_ALCHEMIST_GARDEN,
                 "Clear the alchemist's garden",
                 "Kill rats in the alchemist's garden and bring back 3 rat tails. " +
-                    "You will receive a healing potion and 10 gold pieces.", 20, 10);
+                    "You will receive a minor healing potion and 10 gold pieces.", 20, 10);
 
             clearAlchemistGarden.QuestCompletionItems.Add(new QuestCompletionItem(
                 ItemByID(ITEM_ID_RAT_TAIL), 3));
 
-            clearAlchemistGarden.RewardItem = ItemByID(ITEM_ID_HEALING_POTION);
+            clearAlchemistGarden.RewardItem = ItemByID(ITEM_ID_MINOR_HEALING_POTION);
 
             Quest clearFarmersField = new Quest(QUEST_ID_CLEAR_FARMERS_FIELD,
                 "Clear the farmer's field",
