@@ -36,7 +36,7 @@
             this.lblGold = new System.Windows.Forms.Label();
             this.lblExperience = new System.Windows.Forms.Label();
             this.lblLevel = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
+            this.lblSelectAction = new System.Windows.Forms.Label();
             this.cboWeapons = new System.Windows.Forms.ComboBox();
             this.cboPotions = new System.Windows.Forms.ComboBox();
             this.btnUseWeapon = new System.Windows.Forms.Button();
@@ -49,6 +49,7 @@
             this.rtbMessages = new System.Windows.Forms.RichTextBox();
             this.dgvInventory = new System.Windows.Forms.DataGridView();
             this.dgvQuests = new System.Windows.Forms.DataGridView();
+            this.btnTrade = new System.Windows.Forms.Button();
             this.btnCreateNewPlayer = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvInventory)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvQuests)).BeginInit();
@@ -122,14 +123,14 @@
             this.lblLevel.Size = new System.Drawing.Size(0, 13);
             this.lblLevel.TabIndex = 7;
             // 
-            // label5
+            // lblSelectAction
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(617, 531);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(70, 13);
-            this.label5.TabIndex = 8;
-            this.label5.Text = "Select Action";
+            this.lblSelectAction.AutoSize = true;
+            this.lblSelectAction.Location = new System.Drawing.Point(617, 531);
+            this.lblSelectAction.Name = "lblSelectAction";
+            this.lblSelectAction.Size = new System.Drawing.Size(70, 13);
+            this.lblSelectAction.TabIndex = 8;
+            this.lblSelectAction.Text = "Select Action";
             // 
             // cboWeapons
             // 
@@ -256,12 +257,22 @@
             this.dgvQuests.RowHeadersVisible = false;
             this.dgvQuests.Size = new System.Drawing.Size(312, 189);
             this.dgvQuests.TabIndex = 20;
+            //
+            // btnTrade
+            //
+            this.btnTrade.Location = new System.Drawing.Point(493, 620);
+            this.btnTrade.Name = "btnTrade";
+            this.btnTrade.Size = new System.Drawing.Size(75, 23);
+            this.btnTrade.TabIndex = 21;
+            this.btnTrade.Text = "Trade";
+            this.btnTrade.UseVisualStyleBackColor = true;
+            this.btnTrade.Click += new System.EventHandler(this.btnTrade_Click);
             // 
             // btnCreateNewPlayer
             // 
             this.btnCreateNewPlayer.Location = new System.Drawing.Point(369, 620);
             this.btnCreateNewPlayer.Name = "btnCreateNewPlayer";
-            this.btnCreateNewPlayer.Size = new System.Drawing.Size(86, 25);
+            this.btnCreateNewPlayer.Size = new System.Drawing.Size(75, 23);
             this.btnCreateNewPlayer.TabIndex = 21;
             this.btnCreateNewPlayer.Text = "New Player";
             this.btnCreateNewPlayer.UseVisualStyleBackColor = true;
@@ -273,6 +284,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(719, 651);
             this.Controls.Add(this.btnCreateNewPlayer);
+            this.Controls.Add(this.btnTrade);
             this.Controls.Add(this.dgvQuests);
             this.Controls.Add(this.dgvInventory);
             this.Controls.Add(this.rtbMessages);
@@ -285,7 +297,7 @@
             this.Controls.Add(this.btnUseWeapon);
             this.Controls.Add(this.cboPotions);
             this.Controls.Add(this.cboWeapons);
-            this.Controls.Add(this.label5);
+            this.Controls.Add(this.lblSelectAction);
             this.Controls.Add(this.lblLevel);
             this.Controls.Add(this.lblExperience);
             this.Controls.Add(this.lblGold);
@@ -314,7 +326,7 @@
         private System.Windows.Forms.Label lblGold;
         private System.Windows.Forms.Label lblExperience;
         private System.Windows.Forms.Label lblLevel;
-        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label lblSelectAction;
         private System.Windows.Forms.ComboBox cboWeapons;
         private System.Windows.Forms.ComboBox cboPotions;
         private System.Windows.Forms.Button btnUseWeapon;
@@ -327,6 +339,7 @@
         private System.Windows.Forms.RichTextBox rtbMessages;
         private System.Windows.Forms.DataGridView dgvInventory;
         private System.Windows.Forms.DataGridView dgvQuests;
+        private System.Windows.Forms.Button btnTrade;
         private System.Windows.Forms.Button btnCreateNewPlayer;
     }
 }

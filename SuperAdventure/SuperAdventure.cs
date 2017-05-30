@@ -192,6 +192,7 @@ namespace SuperAdventure
 
             if (e.PropertyName == "Potions")
             {
+                cboPotions.BindingContext = new BindingContext();
                 cboPotions.DataSource = _player.Potions;
                 cboPotions.DisplayMember = "Name";
                 cboPotions.ValueMember = "ID";
@@ -267,6 +268,13 @@ namespace SuperAdventure
             HealingPotion potion = (HealingPotion)cboPotions.SelectedItem;
 
             _player.UsePotion(potion);
+        }
+
+        private void btnTrade_Click(object sender, EventArgs e)
+        {
+            TradingScreen tradingScreen = new TradingScreen();
+            tradingScreen.StartPosition = FormStartPosition.CenterParent;
+            tradingScreen.ShowDialog(this);
         }
 
         private void cboWeapons_SelectedIndexChanged(object sender, EventArgs e)
