@@ -7,13 +7,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Engine;
 
 namespace SuperAdventure
 {
     public partial class TradingScreen : Form
     {
-        public TradingScreen()
+        private Player _currentPlayer;
+
+        public TradingScreen(Player player)
         {
+            _currentPlayer = player;
             InitializeComponent();
         }
 
