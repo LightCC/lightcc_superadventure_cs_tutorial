@@ -207,6 +207,9 @@ namespace SuperAdventure
 
             if (e.PropertyName == "CurrentLocation")
             {
+                // Show/hide current vendor button
+                btnTrade.Visible = (_player.CurrentLocation.VendorWorkingHere != null);
+                
                 // Show/hide available movement buttons
                 btnNorth.Visible = (_player.CurrentLocation.LocationToNorth != null);
                 btnEast.Visible = (_player.CurrentLocation.LocationToEast != null);
