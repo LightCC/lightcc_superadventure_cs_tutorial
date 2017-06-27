@@ -601,7 +601,7 @@ namespace Engine
             {
                 XmlDocument playerData = new XmlDocument();
 
-                playerData.PreserveWhitespace = true;
+              //  playerData.PreserveWhitespace = true;
                 playerData.LoadXml(xmlPlayerData);
 
                 int currentHitPoints = Convert.ToInt32(
@@ -668,12 +668,12 @@ namespace Engine
         public string ToXmlString()
         {
             XmlDocument playerData = new XmlDocument();
-            playerData.PreserveWhitespace = true;
+            //playerData.PreserveWhitespace = true;
 
             // Create the top-level XML node
             XmlNode player = playerData.CreateElement("Player");
             playerData.AppendChild(player);
-            playerData.CreateWhitespace("\n"); // (Environment.NewLine);
+            //playerData.CreateWhitespace("\n"); // (Environment.NewLine);
 
             // Create the "Stats" child node to hold the other player stats nodes
             XmlNode stats = playerData.CreateElement("Stats");
