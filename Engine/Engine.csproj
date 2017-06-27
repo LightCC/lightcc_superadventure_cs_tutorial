@@ -49,6 +49,7 @@
     <Compile Include="MessageEventArgs.cs" />
     <Compile Include="Monster.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PlayerDataMapper.cs" />
     <Compile Include="PlayerQuest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Quest.cs" />
