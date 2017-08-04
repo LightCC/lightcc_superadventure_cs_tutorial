@@ -583,12 +583,25 @@ namespace Engine
             return player;
         }
 
+        public static Player CreatePlayerFromDatabase(
+            int currentHitPoints, int maximumHitPoints, int gold,
+            int experiencePoints, int currentLocationID)
+        {
+            Player player = new Player(currentHitPoints,
+                maximumHitPoints, gold, experiencePoints);
+
+            player.MoveTo(World.LocationByID(currentLocationID));
+
+            return player;
+        }
+
         public static Player CreatePlayerFromXmlString(string xmlPlayerData)
         {
             try
             {
                 XmlDocument playerData = new XmlDocument();
 
+              //  playerData.PreserveWhitespace = true;
                 playerData.LoadXml(xmlPlayerData);
 
                 int currentHitPoints = Convert.ToInt32(
@@ -655,10 +668,12 @@ namespace Engine
         public string ToXmlString()
         {
             XmlDocument playerData = new XmlDocument();
+            //playerData.PreserveWhitespace = true;
 
             // Create the top-level XML node
             XmlNode player = playerData.CreateElement("Player");
             playerData.AppendChild(player);
+            //playerData.CreateWhitespace("\n"); // (Environment.NewLine);
 
             // Create the "Stats" child node to hold the other player stats nodes
             XmlNode stats = playerData.CreateElement("Stats");
