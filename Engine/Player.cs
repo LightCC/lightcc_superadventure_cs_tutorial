@@ -62,6 +62,16 @@ namespace Engine
 
         public HealingPotion CurrentPotion { get; set; }
 
+        /// <summary>
+        /// private Player constructor
+        /// 
+        /// Only called internally, create a Player using one of the helper
+        /// methods, such as Player.CreateDefaultPlayer
+        /// </summary>
+        /// <param name="currentHitPoints"></param>
+        /// <param name="maximumHitPoints"></param>
+        /// <param name="gold"></param>
+        /// <param name="experiencePoints"></param>
         private Player(int currentHitPoints, int maximumHitPoints, int gold, int experiencePoints)
             : base(currentHitPoints, maximumHitPoints)
         {
@@ -570,9 +580,21 @@ namespace Engine
             }
         }
 
+        /// <summary>
+        /// Creates a Default Player at the Default Location
+        /// </summary>
+        /// <returns></returns>
         public static Player CreateDefaultPlayer()
         {
-            Player player = new Player(10, 10, 20, 0);
+            int DEFAULT_HIT_POINTS = 10;
+            int DEFAULT_GOLD = 20;
+            int DEFAULT_EXPERIENCE_POINTS = 0;
+
+            Player player = new Player(
+                DEFAULT_HIT_POINTS,
+                DEFAULT_HIT_POINTS,
+                DEFAULT_GOLD,
+                DEFAULT_EXPERIENCE_POINTS);
             player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));
 
             // add a club as well to test out the weapon combobox logic
