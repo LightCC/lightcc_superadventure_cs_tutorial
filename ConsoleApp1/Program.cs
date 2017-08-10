@@ -31,7 +31,7 @@ namespace SuperAdventureConsole
             while (true)
             {
                 //Display a prompt, so the user knows to type something
-                Console.Write(">");
+                Console.Write("> ");
 
                 // Wait for the user to type something, and press the <Enter> key
                 string userInput = Console.ReadLine();
