@@ -22,6 +22,7 @@ namespace SuperAdventureConsole
             Console.WriteLine("");
 
             DisplayCurrentLocation();
+            Console.WriteLine("");
 
             // Connect player events to functions that will display in the UI
             _player.PropertyChanged += Player_OnPropertyChanged;
@@ -31,7 +32,7 @@ namespace SuperAdventureConsole
             while (true)
             {
                 //Display a prompt, so the user knows to type something
-                Console.Write(">");
+                Console.Write("> ");
 
                 // Wait for the user to type something, and press the <Enter> key
                 string userInput = Console.ReadLine();
