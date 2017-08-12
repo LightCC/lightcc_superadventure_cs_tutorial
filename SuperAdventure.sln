@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperAdventure", "SuperAdve
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "Engine\Engine.csproj", "{C72F26E0-9023-4D16-A5EE-935117070E1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperAdventureConsole", "ConsoleApp1\SuperAdventureConsole.csproj", "{26DB4A04-5412-401A-B1E5-40299DDA4465}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperAdventureConsole", "SuperAdventureConsole\SuperAdventureConsole.csproj", "{26DB4A04-5412-401A-B1E5-40299DDA4465}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
