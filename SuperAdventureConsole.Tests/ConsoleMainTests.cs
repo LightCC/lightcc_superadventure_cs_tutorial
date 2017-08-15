@@ -1,9 +1,7 @@
 ﻿using Engine;
-using SuperAdventureConsole;
 using FluentAssertions;
-using Ploeh.AutoFixture;
-using Xunit;
 using Ploeh.AutoFixture.Xunit2;
+using Xunit;
 
 namespace SuperAdventureConsole_Tests
 {
