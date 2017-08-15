@@ -87,7 +87,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ConsoleApp1\SuperAdventureConsole.csproj">
+    <ProjectReference Include="..\SuperAdventureConsole\SuperAdventureConsole.csproj">
       <Project>{26db4a04-5412-401a-b1e5-40299dda4465}</Project>
       <Name>SuperAdventureConsole</Name>
     </ProjectReference>
