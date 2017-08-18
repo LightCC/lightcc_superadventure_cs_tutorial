@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "Engine\Engine.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperAdventureConsole", "SuperAdventureConsole\SuperAdventureConsole.csproj", "{26DB4A04-5412-401A-B1E5-40299DDA4465}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperAdventureConsole_Tests", "SuperAdventureConsole.Tests\SuperAdventureConsole_Tests.csproj", "{144AD2C9-D724-4F8B-83D1-C576B45B86E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine_Tests", "Engine_Tests\Engine_Tests.csproj", "{C95149F6-0ECC-493E-9E8E-5C46B4DA76EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{26DB4A04-5412-401A-B1E5-40299DDA4465}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26DB4A04-5412-401A-B1E5-40299DDA4465}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26DB4A04-5412-401A-B1E5-40299DDA4465}.Release|Any CPU.Build.0 = Release|Any CPU
+		{144AD2C9-D724-4F8B-83D1-C576B45B86E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{144AD2C9-D724-4F8B-83D1-C576B45B86E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{144AD2C9-D724-4F8B-83D1-C576B45B86E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{144AD2C9-D724-4F8B-83D1-C576B45B86E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C95149F6-0ECC-493E-9E8E-5C46B4DA76EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C95149F6-0ECC-493E-9E8E-5C46B4DA76EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C95149F6-0ECC-493E-9E8E-5C46B4DA76EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C95149F6-0ECC-493E-9E8E-5C46B4DA76EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

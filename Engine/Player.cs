@@ -814,5 +814,17 @@ namespace Engine
         }
 
 #endregion METHODS - MOVEMENT
+        /// <summary>
+        /// Creates a Default Player at the Default Location
+        /// </summary>
+        /// <returns></returns>
+            int DEFAULT_GOLD = 20;
+            int DEFAULT_EXPERIENCE_POINTS = 0;
+
+            Player player = new Player(
+                DEFAULT_HIT_POINTS,
+                DEFAULT_HIT_POINTS,
+                DEFAULT_GOLD,
+                DEFAULT_EXPERIENCE_POINTS);
     }
 }
