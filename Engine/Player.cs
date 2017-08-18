@@ -8,7 +8,7 @@ namespace Engine
 {
     public class Player : LivingCreature
     {
-#region FIELDS
+#region PROPERTIES
         private int _gold;
         public int Gold
         {
@@ -301,7 +301,7 @@ namespace Engine
 
 #endregion PUBLIC CONSTRUCTOR
 
-#region METHODS - FOR FIELDS
+#region METHODS - FOR PROPERTIES
 
         public void AddExperiencePoints(int experiencePointsToAdd)
         {
@@ -447,18 +447,42 @@ namespace Engine
 
 #region METHODS - QUESTS
 
-        public bool HasThisQuest(Quest questToCheck)
+        public bool PlayerDoesNotHaveThisQuest(Quest questToCheck)
         {
-            return Quests.Any(playerQuest => playerQuest.Details.ID == questToCheck.ID);
+            return !Quests.Any(playerQuest => playerQuest.Details.ID == questToCheck.ID);
         }
 
-        public bool CompletedThisQuest(Quest questToCheck)
+        public bool PlayerHasNotCompleted(Quest questToCheck)
         {
-            return Quests.Any(playerQuest => (playerQuest.Details.ID == questToCheck.ID)
+            return !(bool)Quests.Any(playerQuest => (playerQuest.Details.ID == questToCheck.ID)
                 && playerQuest.IsCompleted);
         }
 
-        public bool HasAllQuestCompletionItems(Quest quest)
+        private void GiveQuestToPlayer(Location newLocation)
+        {
+            // Display the messages
+            RaiseMessage("You receive the " + newLocation.QuestAvailableHere.Name +
+                " quest.");
+            RaiseMessage(newLocation.QuestAvailableHere.Description);
+            RaiseMessage("To complete it, return with:");
+            foreach (QuestCompletionItem qci in
+                newLocation.QuestAvailableHere.QuestCompletionItems)
+            {
+                if (qci.Quantity == 1)
+                {
+                    RaiseMessage(qci.Quantity.ToString() + " " + qci.Details.Name);
+                }
+                else
+                {
+                    RaiseMessage(qci.Quantity.ToString() + " " + qci.Details.NamePlural);
+                }
+            }
+
+            // Add the quest to the player's quest list
+            Quests.Add(new PlayerQuest(newLocation.QuestAvailableHere));
+        }
+
+        public bool PlayerHasAllQuestCompletionItems(Quest quest)
         {
             // See if the player has all the items needed to complete the quest here
             foreach (QuestCompletionItem qci in quest.QuestCompletionItems)
@@ -492,6 +516,35 @@ namespace Engine
             }
         }
 
+        private void CompleteQuestAndGiveRewards(Location newLocation)
+        {
+            // Display message
+            RaiseMessage("");
+            RaiseMessage("You complete the " +
+                newLocation.QuestAvailableHere.Name + " quest.");
+
+            // Remove quest items from inventory
+            RemoveQuestCompletionItems(newLocation.QuestAvailableHere);
+
+            // Give quest rewards
+            RaiseMessage("You receive: ");
+            RaiseMessage(newLocation.QuestAvailableHere.RewardExperiencePoints.ToString() +
+                " experience points");
+            RaiseMessage(newLocation.QuestAvailableHere.RewardGold.ToString() +
+                " gold");
+            RaiseMessage(newLocation.QuestAvailableHere.RewardItem.Name);
+
+            AddExperiencePoints(
+                newLocation.QuestAvailableHere.RewardExperiencePoints);
+            Gold += newLocation.QuestAvailableHere.RewardGold;
+
+            // Add the reward item to the player's inventory
+            AddItemToInventory(newLocation.QuestAvailableHere.RewardItem);
+
+            // Mark the quest as completed
+            MarkQuestCompleted(newLocation.QuestAvailableHere);
+        }
+
         public void MarkQuestCompleted(Quest quest)
         {
             // NOTE:  If the player does not have 'quest', this will do nothing
@@ -507,7 +560,7 @@ namespace Engine
             }
         }
 
-#endregion METHODS - QUESTS
+        #endregion METHODS - QUESTS
 
 #region METHODS - MOVEMENT/TURN
 
@@ -562,73 +615,28 @@ namespace Engine
             // so update the player's current location
             CurrentLocation = newLocation;
 
-            // Completely heal the player
-            CurrentHitPoints = MaximumHitPoints;
+            CompletelyHeal();
 
             #region QuestInNewLocation
             if (newLocation.HasAQuest)
             {
-                if (HasThisQuest(newLocation.QuestAvailableHere))
+                if (PlayerDoesNotHaveThisQuest(newLocation.QuestAvailableHere))
                 {
-                    if (!(bool)CompletedThisQuest(newLocation.QuestAvailableHere))
-                    {
-                        if (HasAllQuestCompletionItems(newLocation.QuestAvailableHere))
-                        {
-                            // Quest is completed!!
-
-                            // Display message
-                            RaiseMessage("");
-                            RaiseMessage("You complete the " +
-                                newLocation.QuestAvailableHere.Name + " quest.");
-
-                            // Remove quest items from inventory
-                            RemoveQuestCompletionItems(newLocation.QuestAvailableHere);
-
-                            // Give quest rewards
-                            RaiseMessage("You receive: ");
-                            RaiseMessage(newLocation.QuestAvailableHere.RewardExperiencePoints.ToString() +
-                                " experience points");
-                            RaiseMessage(newLocation.QuestAvailableHere.RewardGold.ToString() +
-                                " gold");
-                            RaiseMessage(newLocation.QuestAvailableHere.RewardItem.Name);
-
-                            AddExperiencePoints(
-                                newLocation.QuestAvailableHere.RewardExperiencePoints);
-                            Gold += newLocation.QuestAvailableHere.RewardGold;
-
-                            // Add the reward item to the player's inventory
-                            AddItemToInventory(newLocation.QuestAvailableHere.RewardItem);
-
-                            // Mark the quest as completed
-                            MarkQuestCompleted(newLocation.QuestAvailableHere);
-                        }
-                    }
+                    GiveQuestToPlayer(newLocation);
                 }
                 else // Player doesn't have the quest yet - so add it to his quest list
                 {
-                    // Display the messages
-                    RaiseMessage("You receive the " + newLocation.QuestAvailableHere.Name +
-                        " quest.");
-                    RaiseMessage(newLocation.QuestAvailableHere.Description);
-                    RaiseMessage("To complete it, return with:");
-                    foreach (QuestCompletionItem qci in
-                        newLocation.QuestAvailableHere.QuestCompletionItems)
+
+                    if (PlayerHasNotCompleted(newLocation.QuestAvailableHere) && 
+                        PlayerHasAllQuestCompletionItems(newLocation.QuestAvailableHere))
                     {
-                        if (qci.Quantity == 1)
-                        {
-                            RaiseMessage(qci.Quantity.ToString() + " " + qci.Details.Name);
-                        }
-                        else
-                        {
-                            RaiseMessage(qci.Quantity.ToString() + " " + qci.Details.NamePlural);
-                        }
+                        // Quest is completed!!
+                        CompleteQuestAndGiveRewards(newLocation);
                     }
 
-                    // Add the quest to the player's quest list
-                    Quests.Add(new PlayerQuest(newLocation.QuestAvailableHere));
                 } // end player has this quest / or not
             } // end quest is available here
-#endregion
+            #endregion
 
             #region MonsterLivingHere
             // Does the location have a monster?
@@ -654,7 +662,13 @@ namespace Engine
             {
                 _currentMonster = null;
             }
-#endregion
+            #endregion
+        }
+
+        private void CompletelyHeal()
+        {
+            // Completely heal the player
+            CurrentHitPoints = MaximumHitPoints;
         }
 
         public void UseWeapon(Weapon weapon)

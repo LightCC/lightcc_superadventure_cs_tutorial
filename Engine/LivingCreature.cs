@@ -15,6 +15,7 @@ namespace Engine
                 OnPropertyChanged("CurrentHitPoints");
             }
         }
+
         public int MaximumHitPoints { get; set; }
 
         public LivingCreature(int currentHitPoints, 
