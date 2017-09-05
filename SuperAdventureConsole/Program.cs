@@ -16,7 +16,7 @@ namespace SuperAdventureConsole
         private static void Main(string[] args)
         {
             // Load the player
-            LoadGameData();
+            _player = PlayerDataMapper.LoadGameData();
 
             Console.WriteLine("Type 'Help' to see a list of commands");
             Console.WriteLine("");
@@ -49,7 +49,7 @@ namespace SuperAdventureConsole
                 // Save the current game data, and brake out of the "while(true)" loop
                 if(cleanedInput == "exit")
                 {
-                    SaveGameData();
+                    PlayerDataMapper.SaveGameData(_player);
 
                     break;
                 }
@@ -417,41 +417,6 @@ namespace SuperAdventureConsole
             {
                 Console.WriteLine(_player.CurrentLocation.Description);
             }
-        }
-
-        /// <summary>
-        /// Loads the SuperAdventureConsole game data from:
-        /// * the XML save file, if it exists where expected
-        /// * otherwise, from the the SuperAdventure database
-        /// </summary>
-        private static void LoadGameData()
-        {
-            _player = PlayerDataMapper.CreateFromDatabase();
-
-            if (_player == null)
-            {
-                if (File.Exists(PLAYER_DATA_FILE_NAME))
-                {
-                    _player = Player.CreatePlayerFromXmlString(
-                        File.ReadAllText(PLAYER_DATA_FILE_NAME));
-                }
-                else
-                {
-                    _player = Player.CreateDefaultPlayer();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Saves the SuperAdventureConsole game data to both:
-        /// * an XML save file
-        /// * the SuperAdventure database
-        /// </summary>
-        private static void SaveGameData()
-        {
-            File.WriteAllText(PLAYER_DATA_FILE_NAME, _player.ToXmlString());
-
-            PlayerDataMapper.SaveToDatabase(_player);
         }
 
     }

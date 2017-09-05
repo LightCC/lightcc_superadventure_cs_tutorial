@@ -91,9 +91,9 @@ namespace Engine
             Quests = new BindingList<PlayerQuest>();
         }
 
-#endregion PRIVATE CONSTRUCTOR
+        #endregion PRIVATE CONSTRUCTOR
 
-#region PUBLIC CONSTRUCTOR
+        #region PUBLIC CONSTRUCTOR
 
         /// <summary>
         /// Creates a Default Player at the Default Location
@@ -106,13 +106,15 @@ namespace Engine
             int DEFAULT_EXPERIENCE_POINTS = 0;
 
             Player player = new Player(
-                DEFAULT_HIT_POINTS,
-                DEFAULT_HIT_POINTS,
+                DEFAULT_HIT_POINTS, // currentHitPoints
+                DEFAULT_HIT_POINTS, // maximumHitPoints
                 DEFAULT_GOLD,
                 DEFAULT_EXPERIENCE_POINTS);
+
             player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));
 
             // add a club as well to test out the weapon combobox logic
+            // TBD remove!! This is for initial testing only!!
             player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_CLUB), 1));
 
             player.CurrentLocation = World.LocationByID(World.LOCATION_ID_HOME);
@@ -120,7 +122,7 @@ namespace Engine
             return player;
         }
 
-        public static Player CreatePlayerFromDatabase(
+        public static Player CreateBaseSavedPlayer(
             int currentHitPoints, int maximumHitPoints, int gold,
             int experiencePoints, int currentLocationID)
         {
@@ -130,173 +132,6 @@ namespace Engine
             player.MoveTo(World.LocationByID(currentLocationID));
 
             return player;
-        }
-
-        public static Player CreatePlayerFromXmlString(string xmlPlayerData)
-        {
-            try
-            {
-                XmlDocument playerData = new XmlDocument();
-
-                //  playerData.PreserveWhitespace = true;
-                playerData.LoadXml(xmlPlayerData);
-
-                int currentHitPoints = Convert.ToInt32(
-                    playerData.SelectSingleNode("/Player/Stats/CurrentHitPoints").InnerText);
-                int maximumHitPoints = Convert.ToInt32(
-                    playerData.SelectSingleNode("/Player/Stats/MaximumHitPoints").InnerText);
-                int gold = Convert.ToInt32(
-                    playerData.SelectSingleNode("/Player/Stats/Gold").InnerText);
-                int experiencePoints = Convert.ToInt32(
-                    playerData.SelectSingleNode("/Player/Stats/ExperiencePoints").InnerText);
-
-                Player player = new Player(
-                    currentHitPoints, maximumHitPoints, gold, experiencePoints);
-
-                int currentLocationID = Convert.ToInt32(
-                    playerData.SelectSingleNode("/Player/Stats/CurrentLocation").InnerText);
-                player.CurrentLocation = World.LocationByID(currentLocationID);
-
-                if (playerData.SelectSingleNode("/Player/Stats/CurrentWeaponID") != null)
-                {
-                    int currentWeaponID = Convert.ToInt32(playerData.SelectSingleNode(
-                        "/Player/Stats/CurrentWeaponID").InnerText);
-                    player.CurrentWeapon = (Weapon)World.ItemByID(currentWeaponID);
-                }
-
-                if (playerData.SelectSingleNode("/Player/Stats/CurrentPotionID") != null)
-                {
-                    int currentPotionID = Convert.ToInt32(playerData.SelectSingleNode(
-                        "/Player/Stats/CurrentPotionID").InnerText);
-                    player.CurrentPotion = (HealingPotion)World.ItemByID(currentPotionID);
-                }
-
-                foreach (XmlNode node in playerData.SelectNodes(
-                    "/Player/InventoryItems/InventoryItem"))
-                {
-                    int itemID = Convert.ToInt32(node.Attributes["ID"].Value);
-                    int itemQuantity = Convert.ToInt32(node.Attributes["Quantity"].Value);
-
-                    // refactored from tutorial due to overloading AddItemToInventory with quantity
-                    player.AddItemToInventory(World.ItemByID(itemID), itemQuantity);
-                }
-
-                foreach (XmlNode node in playerData.SelectNodes(
-                    "/Player/PlayerQuests/PlayerQuest"))
-                {
-                    int questID = Convert.ToInt32(node.Attributes["ID"].Value);
-                    bool questIsCompleted = Convert.ToBoolean(node.Attributes["IsCompleted"].Value);
-
-                    PlayerQuest playerQuest = new PlayerQuest(World.QuestByID(questID));
-                    playerQuest.IsCompleted = questIsCompleted;
-
-                    player.Quests.Add(playerQuest);
-                }
-
-                return player;
-            }
-            catch
-            {
-                // If there was an error with the XML data, return a default player object
-                return Player.CreateDefaultPlayer();
-            }
-        }
-
-        public string ToXmlString()
-        {
-            XmlDocument playerData = new XmlDocument();
-            //playerData.PreserveWhitespace = true;
-
-            // Create the top-level XML node
-            XmlNode player = playerData.CreateElement("Player");
-            playerData.AppendChild(player);
-            //playerData.CreateWhitespace("\n"); // (Environment.NewLine);
-
-            // Create the "Stats" child node to hold the other player stats nodes
-            XmlNode stats = playerData.CreateElement("Stats");
-            player.AppendChild(stats);
-
-            // Create the child nodes for the "Stats" node
-            XmlNode currentHitPoints = playerData.CreateElement("CurrentHitPoints");
-            currentHitPoints.AppendChild(playerData.CreateTextNode(
-                this.CurrentHitPoints.ToString()));
-            stats.AppendChild(currentHitPoints);
-
-            XmlNode maximumHitPoints = playerData.CreateElement("MaximumHitPoints");
-            maximumHitPoints.AppendChild(playerData.CreateTextNode(
-                this.MaximumHitPoints.ToString()));
-            stats.AppendChild(maximumHitPoints);
-
-            XmlNode gold = playerData.CreateElement("Gold");
-            gold.AppendChild(playerData.CreateTextNode(this.Gold.ToString()));
-            stats.AppendChild(gold);
-
-            XmlNode experiencePoints = playerData.CreateElement("ExperiencePoints");
-            experiencePoints.AppendChild(playerData.CreateTextNode(this.ExperiencePoints.ToString()));
-            stats.AppendChild(experiencePoints);
-
-            XmlNode currentLocation = playerData.CreateElement("CurrentLocation");
-            currentLocation.AppendChild(playerData.CreateTextNode(this.CurrentLocation.ID.ToString()));
-            stats.AppendChild(currentLocation);
-
-            if (CurrentWeapon != null)
-            {
-                XmlNode currentWeaponID = playerData.CreateElement("CurrentWeaponID");
-                currentWeaponID.AppendChild(playerData.CreateTextNode(
-                    this.CurrentWeapon.ID.ToString()));
-                stats.AppendChild(currentWeaponID);
-            }
-
-            if (CurrentPotion != null)
-            {
-                XmlNode currentPotionID = playerData.CreateElement("CurrentPotionID");
-                currentPotionID.AppendChild(playerData.CreateTextNode(
-                    this.CurrentPotion.ID.ToString()));
-                stats.AppendChild(currentPotionID);
-            }
-
-            // Create the "InventoryItems" node
-            XmlNode inventoryItems = playerData.CreateElement("InventoryItems");
-            player.AppendChild(inventoryItems);
-
-            // Create an "InventoryItem" node for each item in the player's inventory
-            foreach (InventoryItem Item in this.Inventory)
-            {
-                XmlNode inventoryItem = playerData.CreateElement("InventoryItem");
-
-                XmlAttribute idAttribute = playerData.CreateAttribute("ID");
-                idAttribute.Value = Item.Details.ID.ToString();
-                inventoryItem.Attributes.Append(idAttribute);
-
-                XmlAttribute quantityAttribute = playerData.CreateAttribute("Quantity");
-                quantityAttribute.Value = Item.Quantity.ToString();
-                inventoryItem.Attributes.Append(quantityAttribute);
-
-                inventoryItems.AppendChild(inventoryItem);
-            }
-
-            // Create the "PlayerQuests" node
-            XmlNode playerQuests = playerData.CreateElement("PlayerQuests");
-            player.AppendChild(playerQuests);
-
-            // Create a "PlayerQuests" child node to hold each PlayerQuest node
-            foreach (PlayerQuest Quest in this.Quests)
-            {
-                XmlNode playerQuest = playerData.CreateElement("PlayerQuest");
-
-                XmlAttribute idAttribute = playerData.CreateAttribute("ID");
-                idAttribute.Value = Quest.Details.ID.ToString();
-                playerQuest.Attributes.Append(idAttribute);
-
-                XmlAttribute isCompleted = playerData.CreateAttribute("IsCompleted");
-                isCompleted.Value = Quest.IsCompleted.ToString();
-                playerQuest.Attributes.Append(isCompleted);
-
-                // Applied the playerQuest item for this Quest as a child node to the playerQuests node
-                playerQuests.AppendChild(playerQuest);
-            }
-
-            return playerData.InnerXml; // The XML document, as a string
         }
 
 #endregion PUBLIC CONSTRUCTOR
@@ -814,17 +649,5 @@ namespace Engine
         }
 
 #endregion METHODS - MOVEMENT
-        /// <summary>
-        /// Creates a Default Player at the Default Location
-        /// </summary>
-        /// <returns></returns>
-            int DEFAULT_GOLD = 20;
-            int DEFAULT_EXPERIENCE_POINTS = 0;
-
-            Player player = new Player(
-                DEFAULT_HIT_POINTS,
-                DEFAULT_HIT_POINTS,
-                DEFAULT_GOLD,
-                DEFAULT_EXPERIENCE_POINTS);
     }
 }
