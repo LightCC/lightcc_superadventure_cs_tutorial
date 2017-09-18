@@ -27,6 +27,7 @@ namespace Engine
                     using (SqlCommand savedGameCommand = connection.CreateCommand())
                     {
                         savedGameCommand.CommandType = CommandType.Text;
+                        
                         // This SQL statement reads the first rows in the SavedGame table.
                         // For this program, we should only ever have one row,
                         // but this will ensure we only get one record in our 
