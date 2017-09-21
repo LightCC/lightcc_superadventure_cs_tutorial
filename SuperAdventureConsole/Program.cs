@@ -187,7 +187,7 @@ namespace SuperAdventureConsole
             }
             else if (input.Contains("attack"))
             {
-                if (_player.CurrentLocation.MonsterLivingHere == null)
+                if (_player.CurrentLocation.HasAMonster == false)
                 {
                     Console.WriteLine("There is nothing here to attack");
                 }
@@ -204,7 +204,7 @@ namespace SuperAdventureConsole
                     }
                     else
                     {
-                        _player.UseWeapon(_player.CurrentWeapon);
+                        _player.UseItemInBattle(_player.CurrentWeapon);
                     }
                 }
             }
@@ -257,7 +257,7 @@ namespace SuperAdventureConsole
                     }
                     else
                     {
-                        _player.UsePotion(potionToDrink);
+                        _player.UseItemInBattle(potionToDrink);
                     }
                 }
             }

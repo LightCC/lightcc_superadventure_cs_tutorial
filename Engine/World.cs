@@ -9,6 +9,8 @@ namespace Engine
         public static readonly List<Quest> Quests = new List<Quest>();
         public static readonly List<Location> Locations = new List<Location>();
 
+        public const int UNSELLABLE_ITEM_PRICE = -1;
+
         public const int ITEM_ID_RUSTY_SWORD = 1;
         public const int ITEM_ID_RAT_TAIL = 2;
         public const int ITEM_ID_PIECE_OF_FUR = 3;
@@ -19,7 +21,7 @@ namespace Engine
         public const int ITEM_ID_SPIDER_FANG = 8;
         public const int ITEM_ID_SPIDER_SILK = 9;
         public const int ITEM_ID_ADVENTURER_PASS = 10;
-        public const int ITEM_ID_HEALING_POTION = 11;
+        //public const int ITEM_ID_HEALING_POTION = 11;
 
         public const int MONSTER_ID_RAT = 1;
         public const int MONSTER_ID_SNAKE = 2;
@@ -38,8 +40,6 @@ namespace Engine
         public const int LOCATION_ID_BRIDGE = 8;
         public const int LOCATION_ID_SPIDER_FIELD = 9;
 
-        public const int UNSELLABLE_ITEM_PRICE = -1;
-
         static World()
         {
             PopulateItems();
@@ -53,7 +53,7 @@ namespace Engine
             Items.Add(new Weapon(ITEM_ID_RUSTY_SWORD, "Rusty sword", "Rusty swords", 0, 5, 5));
             Items.Add(new Weapon(ITEM_ID_CLUB, "Club", "Clubs", 3, 10, 8));
             Items.Add(new HealingPotion(ITEM_ID_MINOR_HEALING_POTION, "Minor Healing potion", "Minor Healing potions", 10, 3));
-            Items.Add(new HealingPotion(ITEM_ID_HEALING_POTION, "Healing potion", "Healing potions", 20, 10));
+            //Items.Add(new HealingPotion(ITEM_ID_HEALING_POTION, "Healing potion", "Healing potions", 20, 10));
             Items.Add(new Item(ITEM_ID_RAT_TAIL, "Rat tail", "Rat tails", 1));
             Items.Add(new Item(ITEM_ID_PIECE_OF_FUR, "Piece of fur", "Pieces of fur", 1));
             Items.Add(new Item(ITEM_ID_SNAKE_FANG, "Snake fang", "Snake fangs", 1));
@@ -85,10 +85,11 @@ namespace Engine
 
         private static void PopulateQuests()
         {
-            Quest clearAlchemistGarden = new Quest(QUEST_ID_CLEAR_ALCHEMIST_GARDEN,
+            Quest clearAlchemistGarden = new Quest(
+                QUEST_ID_CLEAR_ALCHEMIST_GARDEN,
                 "Clear the alchemist's garden",
                 "Kill rats in the alchemist's garden and bring back 3 rat tails. " +
-                    "You will receive a minor healing potion and 10 gold pieces.", 20, 10);
+                "You will receive a minor healing potion and 10 gold pieces.", 20, 10);
 
             clearAlchemistGarden.QuestCompletionItems.Add(new QuestCompletionItem(
                 ItemByID(ITEM_ID_RAT_TAIL), 3));
@@ -131,7 +132,8 @@ namespace Engine
 
             Location alchemistsGarden = new Location(LOCATION_ID_ALCHEMIST_GARDEN,
                 "Alchemist's garden", "Many plants are growing here.");
-            alchemistsGarden.MonsterLivingHere = MonsterByID(MONSTER_ID_RAT);
+            alchemistsGarden.AddMonster(MONSTER_ID_RAT, 80);
+            alchemistsGarden.AddMonster(MONSTER_ID_SNAKE, 20);
 
             Location farmhouse = new Location(LOCATION_ID_FARMHOUSE,
                 "Farmhouse", "There is a small farmhouse, with a farmer in front.");
@@ -139,7 +141,8 @@ namespace Engine
 
             Location farmersField = new Location(LOCATION_ID_FARM_FIELD,
                 "Farmer's field", "You see rows of vegetables growing here.");
-            farmersField.MonsterLivingHere = MonsterByID(MONSTER_ID_SNAKE);
+            farmersField.AddMonster(MONSTER_ID_SNAKE, 80);
+            farmersField.AddMonster(MONSTER_ID_RAT, 20);
 
             Location guardPost = new Location(LOCATION_ID_GUARD_POST,
                 "Guard post", "There is a large, tough-looking guard here.",
@@ -150,7 +153,7 @@ namespace Engine
 
             Location spiderField = new Location(LOCATION_ID_SPIDER_FIELD,
                 "Forest", "You see spider webs covering the trees in this forest.");
-            spiderField.MonsterLivingHere = MonsterByID(MONSTER_ID_GIANT_SPIDER);
+            spiderField.AddMonster(MONSTER_ID_GIANT_SPIDER, 100);
 
             //Link the locations together
             home.LocationToNorth = townSquare;

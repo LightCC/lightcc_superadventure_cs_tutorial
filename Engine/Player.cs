@@ -8,8 +8,17 @@ namespace Engine
 {
     public class Player : LivingCreature
     {
-#region PROPERTIES
+        #region FIELDS
+
         private int _gold;
+        private int _experiencePoints;
+        private Monster _currentMonster;
+        private Location _currentLocation;
+
+        #endregion FIELDS
+
+        #region PROPERTIES
+
         public int Gold
         {
             get { return _gold; }
@@ -20,7 +29,6 @@ namespace Engine
             }
         }
 
-        private int _experiencePoints;
         public int ExperiencePoints
         {
             get { return _experiencePoints; }
@@ -38,13 +46,6 @@ namespace Engine
             get { return ((ExperiencePoints / 100) + 1); }
         }
 
-        public BindingList<InventoryItem> Inventory { get; set; }
-
-        public BindingList<PlayerQuest> Quests { get; set; }
-
-        private Monster _currentMonster;
-
-        private Location _currentLocation;
         public Location CurrentLocation
         {
             get { return _currentLocation; }
@@ -57,14 +58,14 @@ namespace Engine
 
         public Weapon CurrentWeapon { get; set; }
 
-        public HealingPotion CurrentPotion { get; set; }
+        public BindingList<InventoryItem> Inventory { get; set; }
 
         public List<Weapon> Weapons
         {
             get
             {
                 return Inventory.Where(x => x.Details is Weapon).Select(
-                  x => x.Details as Weapon).ToList();
+                    x => x.Details as Weapon).ToList();
             }
         }
 
@@ -73,11 +74,15 @@ namespace Engine
             get
             {
                 return Inventory.Where(x => x.Details is HealingPotion).Select(
-            x => x.Details as HealingPotion).ToList();
+                    x => x.Details as HealingPotion).ToList();
             }
         }
 
-#endregion FIELDS
+        public BindingList<PlayerQuest> Quests { get; set; }
+
+        public HealingPotion CurrentPotion { get; set; }
+
+#endregion PROPERTIES
 
 #region PRIVATE CONSTRUCTOR
 
@@ -106,12 +111,13 @@ namespace Engine
             int DEFAULT_EXPERIENCE_POINTS = 0;
 
             Player player = new Player(
-                DEFAULT_HIT_POINTS,
-                DEFAULT_HIT_POINTS,
+                DEFAULT_HIT_POINTS,  // CurrentHitPoints
+                DEFAULT_HIT_POINTS,  // MaximumHitPoints
                 DEFAULT_GOLD,
                 DEFAULT_EXPERIENCE_POINTS);
             player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_RUSTY_SWORD), 1));
 
+            // TODO - Remove this for production
             // add a club as well to test out the weapon combobox logic
             player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_CLUB), 1));
 
@@ -316,7 +322,7 @@ namespace Engine
         private void RaiseInventoryChangedEvent(Item item)
         {
             if(item is Weapon) { OnPropertyChanged("Weapons"); }
-            if(item is HealingPotion) { OnPropertyChanged("HealingPotion"); }
+            if(item is HealingPotion) { OnPropertyChanged("Potions"); }
         }
 
         // Event to be used with RaiseMessage
@@ -458,15 +464,15 @@ namespace Engine
                 && playerQuest.IsCompleted);
         }
 
-        private void GiveQuestToPlayer(Location newLocation)
+        private void GiveQuestToPlayer(Quest questToGive)
         {
             // Display the messages
-            RaiseMessage("You receive the " + newLocation.QuestAvailableHere.Name +
+            RaiseMessage("You receive the " + questToGive.Name +
                 " quest.");
-            RaiseMessage(newLocation.QuestAvailableHere.Description);
+            RaiseMessage(questToGive.Description);
             RaiseMessage("To complete it, return with:");
             foreach (QuestCompletionItem qci in
-                newLocation.QuestAvailableHere.QuestCompletionItems)
+                questToGive.QuestCompletionItems)
             {
                 if (qci.Quantity == 1)
                 {
@@ -479,7 +485,7 @@ namespace Engine
             }
 
             // Add the quest to the player's quest list
-            Quests.Add(new PlayerQuest(newLocation.QuestAvailableHere));
+            Quests.Add(new PlayerQuest(questToGive));
         }
 
         public bool PlayerHasAllQuestCompletionItems(Quest quest)
@@ -516,33 +522,33 @@ namespace Engine
             }
         }
 
-        private void CompleteQuestAndGiveRewards(Location newLocation)
+        private void CompleteQuestAndGiveRewards(Quest questToComplete)
         {
             // Display message
             RaiseMessage("");
             RaiseMessage("You complete the " +
-                newLocation.QuestAvailableHere.Name + " quest.");
+                         questToComplete.Name + " quest.");
 
             // Remove quest items from inventory
-            RemoveQuestCompletionItems(newLocation.QuestAvailableHere);
+            RemoveQuestCompletionItems(questToComplete);
 
             // Give quest rewards
             RaiseMessage("You receive: ");
-            RaiseMessage(newLocation.QuestAvailableHere.RewardExperiencePoints.ToString() +
+            RaiseMessage(questToComplete.RewardExperiencePoints.ToString() +
                 " experience points");
-            RaiseMessage(newLocation.QuestAvailableHere.RewardGold.ToString() +
+            RaiseMessage(questToComplete.RewardGold.ToString() +
                 " gold");
-            RaiseMessage(newLocation.QuestAvailableHere.RewardItem.Name);
+            RaiseMessage(questToComplete.RewardItem.Name);
 
             AddExperiencePoints(
-                newLocation.QuestAvailableHere.RewardExperiencePoints);
-            Gold += newLocation.QuestAvailableHere.RewardGold;
+                questToComplete.RewardExperiencePoints);
+            Gold += questToComplete.RewardGold;
 
             // Add the reward item to the player's inventory
-            AddItemToInventory(newLocation.QuestAvailableHere.RewardItem);
-
+            AddItemToInventory(questToComplete.RewardItem);
+            
             // Mark the quest as completed
-            MarkQuestCompleted(newLocation.QuestAvailableHere);
+            MarkQuestCompleted(questToComplete);
         }
 
         public void MarkQuestCompleted(Quest quest)
@@ -603,7 +609,6 @@ namespace Engine
 
         public void MoveTo(Location newLocation)
         {
-            // Make sure _player has any required item for the new location
             if (!HasRequiredItemToEnterThisLocation(newLocation))
             {
                 RaiseMessage("You must have a " + newLocation.ItemRequiredToEnter.Name +
@@ -612,7 +617,6 @@ namespace Engine
             }
 
             // We have any required item, or there wasn't an item required,
-            // so update the player's current location
             CurrentLocation = newLocation;
 
             CompletelyHeal();
@@ -622,16 +626,15 @@ namespace Engine
             {
                 if (PlayerDoesNotHaveThisQuest(newLocation.QuestAvailableHere))
                 {
-                    GiveQuestToPlayer(newLocation);
+                    GiveQuestToPlayer(newLocation.QuestAvailableHere);
                 }
                 else // Player doesn't have the quest yet - so add it to his quest list
                 {
-
                     if (PlayerHasNotCompleted(newLocation.QuestAvailableHere) && 
                         PlayerHasAllQuestCompletionItems(newLocation.QuestAvailableHere))
                     {
                         // Quest is completed!!
-                        CompleteQuestAndGiveRewards(newLocation);
+                        CompleteQuestAndGiveRewards(newLocation.QuestAvailableHere);
                     }
 
                 } // end player has this quest / or not
@@ -640,23 +643,12 @@ namespace Engine
 
             #region MonsterLivingHere
             // Does the location have a monster?
-            if (newLocation.MonsterLivingHere != null)
+            if (newLocation.HasAMonster)
             {
-                RaiseMessage("You see a " + newLocation.MonsterLivingHere.Name);
+                // Create a new random monster from those available in this location
+                _currentMonster = newLocation.NewInstanceOfMonsterLivingHere();
 
-                // Make a new monster, using the values from the standard monster
-                // in the World.Monster list
-                Monster standardMonster = World.MonsterByID(newLocation.MonsterLivingHere.ID);
-
-                _currentMonster = new Monster(standardMonster.ID, standardMonster.Name,
-                    standardMonster.MaximumDamage, standardMonster.RewardExperiencePoints,
-                    standardMonster.RewardGold, standardMonster.CurrentHitPoints,
-                    standardMonster.MaximumHitPoints);
-
-                foreach (LootItem lootItem in standardMonster.LootTable)
-                {
-                    _currentMonster.LootTable.Add(lootItem);
-                }
+                RaiseMessage("You see a " + _currentMonster.Name);
             }
             else // There is not a MonsterLivingHere
             {
@@ -671,7 +663,24 @@ namespace Engine
             CurrentHitPoints = MaximumHitPoints;
         }
 
-        public void UseWeapon(Weapon weapon)
+        public void UseItemInBattle(Item itemUsed)
+        {
+            if (itemUsed is Weapon)
+            {
+                UseWeaponInBattle((Weapon)itemUsed);
+            }
+            else if (itemUsed is HealingPotion)
+            {
+                UsePotionInBattle((HealingPotion)itemUsed);
+            }
+            else
+            {
+                // Do nothing, the item sent is not usable in battle
+                // This should be effectively the same as not using the item
+            }
+        }
+
+        private void UseWeaponInBattle(Weapon weapon)
         {
             // Player gets to swing first
             // Determine amount of damage to do to the monster
@@ -700,32 +709,8 @@ namespace Engine
                 Gold += _currentMonster.RewardGold;
                 RaiseMessage("You receive " + _currentMonster.RewardGold + " gold");
 
-                // Get random loot items from the monster
-                List<InventoryItem> lootedItems = new List<InventoryItem>();
-
-                // Add items to the lootedItems list, comparing a random number to the drop %
-                foreach(LootItem lootItem in _currentMonster.LootTable)
-                {
-                    if(RandomNumberGenerator.NumberBetween(1, 100) <= lootItem.DropPercentage)
-                    {
-                        lootedItems.Add(new InventoryItem(lootItem.Details, 1));
-                    }
-                }
-
-                // If no items were randomly selected, then add the default loot item(s).
-                if(lootedItems.Count == 0)
-                {
-                    foreach (LootItem lootItem in _currentMonster.LootTable)
-                    {
-                        if (lootItem.IsDefaultItem)
-                        {
-                            lootedItems.Add(new InventoryItem(lootItem.Details, 1));
-                        }
-                    }
-                }
-
-                // Add the looted items to the player's inventory
-                foreach(InventoryItem inventoryItem in lootedItems)
+                // Add the LootItems from the Monster to Inventory
+                foreach(InventoryItem inventoryItem in _currentMonster.LootItems)
                 {
                     AddItemToInventory(inventoryItem.Details);
 
@@ -773,7 +758,7 @@ namespace Engine
             }
         }
 
-        public void UsePotion(HealingPotion potion)
+        private void UsePotionInBattle(HealingPotion potion)
         {
             // Add healing amount to the player's current hit points
             CurrentHitPoints += potion.AmountToHeal;
