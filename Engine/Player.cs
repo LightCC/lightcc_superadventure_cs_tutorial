@@ -119,7 +119,7 @@ namespace Engine
 
             // TODO - Remove this for production
             // add a club as well to test out the weapon combobox logic
-            player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_CLUB), 1));
+            //player.Inventory.Add(new InventoryItem(World.ItemByID(World.ITEM_ID_CLUB), 1));
 
             player.CurrentLocation = World.LocationByID(World.LOCATION_ID_HOME);
 
