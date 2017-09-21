@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Engine;
 using System.IO;
@@ -14,24 +10,29 @@ namespace SuperAdventure
 {
     public partial class SuperAdventure : Form
     {
-        private Player _player;
         private const string PLAYER_DATA_FILE_NAME = "PlayerData.xml";
+
+        private Player _player;
 
         public SuperAdventure()
         {
             InitializeComponent();
 
-            if (File.Exists(PLAYER_DATA_FILE_NAME))
+            _player = PlayerDataMapper.CreateFromDatabase();
+
+            if (_player == null)
             {
-                _player = Player.CreatePlayerFromXmlString(
-                    File.ReadAllText(PLAYER_DATA_FILE_NAME));
-            }
-            else
-            {
-                _player = Player.CreateDefaultPlayer();
+                if (File.Exists(PLAYER_DATA_FILE_NAME))
+                {
+                    _player = Player.CreatePlayerFromXmlString(File.ReadAllText(PLAYER_DATA_FILE_NAME));
+                }
+                else
+                {
+                    _player = Player.CreateDefaultPlayer();
+                }
             }
 
-            BindUiElementsToNewPlayer(_player);
+            BindUiElementsToPlayer(_player);
 
             // Move to the player's location to reset UI/status of everything
             _player.MoveTo(_player.CurrentLocation);
@@ -50,13 +51,13 @@ namespace SuperAdventure
             rtbMessages.ScrollToCaret();
         }
 
-        private void BindUiElementsToNewPlayer(Player player)
+        private void BindUiElementsToPlayer(Player player)
         {
             BindPlayerStatsToLabels(player);
             BindInventoryToGrid(player.Inventory);
             BindQuestsToGrid(player.Quests);
             BindWeaponsToComboBox(player.Weapons, player.CurrentWeapon);
-            BindPotionsToComboBox(player.Potions);
+            BindPotionsToComboBox(player.Potions, player.CurrentPotion);
 
             player.PropertyChanged += PlayerOnPropertyChanged;
             player.OnMessage += DisplayMessage;
@@ -170,7 +171,7 @@ namespace SuperAdventure
             _player = Player.CreateDefaultPlayer();
 
             // Bind UI Elements to the new player object
-            BindUiElementsToNewPlayer(_player);
+            BindUiElementsToPlayer(_player);
 
             // Clean-up interface after creating a new player
             _player.MoveTo(_player.CurrentLocation);
@@ -192,7 +193,6 @@ namespace SuperAdventure
 
             if (e.PropertyName == "Potions")
             {
-                cboPotions.BindingContext = new BindingContext();
                 cboPotions.DataSource = _player.Potions;
                 cboPotions.DisplayMember = "Name";
                 cboPotions.ValueMember = "ID";
@@ -220,19 +220,19 @@ namespace SuperAdventure
                 rtbLocation.Text = _player.CurrentLocation.Name + Environment.NewLine;
                 rtbLocation.Text += _player.CurrentLocation.Description + Environment.NewLine;
 
-                if(_player.CurrentLocation.MonsterLivingHere == null)
-                {
-                    cboWeapons.Visible = false;
-                    cboPotions.Visible = false;
-                    btnUseWeapon.Visible = false;
-                    btnUsePotion.Visible = false;
-                }
-                else
+                if(_player.CurrentLocation.HasAMonster)
                 {
                     cboWeapons.Visible = _player.Weapons.Any();
                     cboPotions.Visible = _player.Potions.Any();
                     btnUseWeapon.Visible = _player.Weapons.Any();
                     btnUsePotion.Visible = _player.Potions.Any();
+                }
+                else
+                {
+                    cboWeapons.Visible = false;
+                    cboPotions.Visible = false;
+                    btnUseWeapon.Visible = false;
+                    btnUsePotion.Visible = false;
                 }
             }
         }
@@ -262,15 +262,15 @@ namespace SuperAdventure
             // Get the currently selected weapon from the cboWeapons ComboBox
             Weapon currentWeapon = (Weapon)cboWeapons.SelectedItem;
 
-            _player.UseWeapon(currentWeapon);
+            _player.UseItemInBattle(currentWeapon);
         }
 
         private void btnUsePotion_Click(object sender, EventArgs e)
         {
             // Get currently selected potion from the combobox
-            HealingPotion potion = (HealingPotion)cboPotions.SelectedItem;
+            HealingPotion currentPotion = (HealingPotion)cboPotions.SelectedItem;
 
-            _player.UsePotion(potion);
+            _player.UseItemInBattle(currentPotion);
         }
 
         private void btnTrade_Click(object sender, EventArgs e)
