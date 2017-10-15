@@ -9,25 +9,38 @@ namespace SuperAdventure
     public partial class WorldMap : Form
     {
         readonly Assembly _thisAssembly = Assembly.GetExecutingAssembly();
+        private Player _player;
 
         public WorldMap(Player player)
         {
             InitializeComponent();
 
-            SetImage(pic_0_2, player.LocationsVisited.Contains(World.LOCATION_ID_ALCHEMIST_GARDEN) ? "HerbalistsGarden" : "FogLocation");
-            SetImage(pic_1_2, player.LocationsVisited.Contains(World.LOCATION_ID_ALCHEMIST_HUT) ? "HerbalistsHut" : "FogLocation");
-            SetImage(pic_2_0, player.LocationsVisited.Contains(World.LOCATION_ID_FARM_FIELD) ? "FarmFields" : "FogLocation");
-            SetImage(pic_2_1, player.LocationsVisited.Contains(World.LOCATION_ID_FARMHOUSE) ? "Farmhouse" : "FogLocation");
-            SetImage(pic_2_2, player.LocationsVisited.Contains(World.LOCATION_ID_TOWN_SQUARE) ? "TownSquare" : "FogLocation");
-            SetImage(pic_2_3, player.LocationsVisited.Contains(World.LOCATION_ID_GUARD_POST) ? "TownGate" : "FogLocation");
-            SetImage(pic_2_4, player.LocationsVisited.Contains(World.LOCATION_ID_BRIDGE) ? "Bridge" : "FogLocation");
-            SetImage(pic_2_5, player.LocationsVisited.Contains(World.LOCATION_ID_SPIDER_FIELD) ? "SpiderForest" : "FogLocation");
-            SetImage(pic_3_2, player.LocationsVisited.Contains(World.LOCATION_ID_HOME) ? "Home" : "FogLocation");
+            _player = player;
+
+            SetImage(pic_0_2, World.LOCATION_ID_ALCHEMIST_GARDEN);
+            SetImage(pic_1_2, World.LOCATION_ID_ALCHEMIST_HUT);
+            SetImage(pic_2_0, World.LOCATION_ID_FARM_FIELD);
+            SetImage(pic_2_1, World.LOCATION_ID_FARMHOUSE);
+            SetImage(pic_2_2, World.LOCATION_ID_TOWN_SQUARE);
+            SetImage(pic_2_3, World.LOCATION_ID_GUARD_POST);
+            SetImage(pic_2_4, World.LOCATION_ID_BRIDGE);
+            SetImage(pic_2_5, World.LOCATION_ID_SPIDER_FIELD);
+            SetImage(pic_3_2, World.LOCATION_ID_HOME);
         }
 
-        private void SetImage(PictureBox pictureBoxTarget, string imageName)
+        private void SetImage(PictureBox pictureBoxTarget, int locationId)
         {
-            using (Stream resourceStream = _thisAssembly.GetManifestResourceStream(_thisAssembly.GetName().Name + ".Images." + imageName + ".png"))
+            string imageName;
+            if (_player.LocationsVisited.Contains(locationId))
+            {
+                imageName = World.LocationByID(locationId).ImagePngFilename;
+            }
+            else
+            {
+                imageName = "FogLocation.png";
+            }
+
+            using (Stream resourceStream = _thisAssembly.GetManifestResourceStream(_thisAssembly.GetName().Name + ".Images." + imageName))
             {
                 if (resourceStream != null)
                 {
