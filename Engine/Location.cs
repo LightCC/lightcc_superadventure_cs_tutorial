@@ -14,6 +14,7 @@ namespace Engine
         public Item ItemRequiredToEnter { get; set; }
         public Quest QuestAvailableHere { get;  set; }
         public Vendor VendorWorkingHere { get; set; }
+        public string ImagePngFilename { get; set; }
 
         public Location LocationToNorth { get; set; }
         public Location LocationToEast { get; set; }
@@ -29,13 +30,15 @@ namespace Engine
             string name, 
             string description,
             Item itemRequiredToEnter = null,
-            Quest questAvailableHere = null)
+            Quest questAvailableHere = null,
+            string imagePngFilename = "Default.png")
         {
             ID = id;
             Name = name;
             Description = description;
             ItemRequiredToEnter = itemRequiredToEnter;
             QuestAvailableHere = questAvailableHere;
+            ImagePngFilename = imagePngFilename;
         }
 
         public void AddMonster(int monsterID, int percentageOfAppearance)

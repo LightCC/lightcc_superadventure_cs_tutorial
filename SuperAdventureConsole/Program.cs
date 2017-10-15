@@ -426,7 +426,7 @@ namespace SuperAdventureConsole
         /// </summary>
         private static void LoadGameData()
         {
-            _player = PlayerDataMapper.CreateFromDatabase();
+            _player = Player.CreateFromDatabase();
 
             if (_player == null)
             {
@@ -451,7 +451,7 @@ namespace SuperAdventureConsole
         {
             File.WriteAllText(PLAYER_DATA_FILE_NAME, _player.ToXmlString());
 
-            PlayerDataMapper.SaveToDatabase(_player);
+            Player.SaveToDatabase(_player);
         }
 
     }
