@@ -4,10 +4,10 @@ using System.Data.SqlClient;
 
 namespace Engine
 {
-    public static class PlayerDataMapper
+    public partial class Player : LivingCreature
     {
-        private static readonly string _connectionString =
-            "Data Source=(local);Initial Catalog=SuperAdventure;Integrated Security=True";
+        //private static readonly string _connectionString = "Data Source=(local);Initial Catalog=SuperAdventure;Integrated Security=True";
+        private static readonly string _connectionString = "Server=RYZEN7_MSL\\SQLEX;Database=SuperAdventure;Trusted_Connection=True";
 
         public static Player CreateFromDatabase()
         {
@@ -21,27 +21,20 @@ namespace Engine
 
                     Player player;
 
-                    // Create a SQL command object, that uses the connection to
-                    // our database. The SqlCommand object is where we create our
-                    // SQL statement.
+                    // Create a SQL command object, that uses the connection to our database. The SqlCommand object is where we create our SQL statement.
                     using (SqlCommand savedGameCommand = connection.CreateCommand())
                     {
                         savedGameCommand.CommandType = CommandType.Text;
-                        // This SQL statement reads the first rows in the SavedGame table.
-                        // For this program, we should only ever have one row,
-                        // but this will ensure we only get one record in our 
-                        // SQL query results.
+                        // This SQL statement reads the first rows in the SavedGame table. For this program, we should only ever have one row, but this will ensure we only get one record in our SQL query results.
                         savedGameCommand.CommandText = "SELECT TOP 1 * FROM SavedGame";
 
-                        // Use ExecuteReader when you expect the query to return a row,
-                        // or rows
+                        // Use ExecuteReader when you expect the query to return a row, or rows
                         SqlDataReader reader = savedGameCommand.ExecuteReader();
 
                         // Check if the query did not return a row/record of data
                         if (!reader.HasRows)
                         {
-                            // There is no data in the SavedGame table,
-                            // so return null (no saved player data)
+                            // There is no data in the SavedGame table, so return null (no saved player data)
                             return null;
                         }
 
@@ -56,15 +49,13 @@ namespace Engine
                         int currentLocationID = (int)reader["CurrentLocationID"];
 
                         // Create the Player object, with the saved game values
-                        player = Player.CreatePlayerFromDatabase(currentHitPoints,
-                            maximumHitPoints,
-                            gold,
-                            experiencePoints,
-                            currentLocationID);
+                        player = new Player(currentHitPoints, maximumHitPoints, gold, experiencePoints);
+                        player.CurrentLocation = World.LocationByID(currentLocationID);
+
+                        reader.Close();
                     }
 
-                    // Read the rows/records from the Quest table, and add them
-                    // to the player
+                    // Read the rows/records from the Quest table, and add them to the player
                     using (SqlCommand questCommand = connection.CreateCommand())
                     {
                         questCommand.CommandType = CommandType.Text;
@@ -88,6 +79,8 @@ namespace Engine
                                 player.Quests.Add(playerQuest);
                             }
                         }
+
+                        reader.Close();
                     }
 
                     // Read the rows/records from the Inventory table, and add
@@ -111,9 +104,34 @@ namespace Engine
                                     World.ItemByID(inventoryItemID), quantity);
                             }
                         }
+
+                        reader.Close();
+                    }
+
+                    // Read the rows/records from the LocationVisited table, and add them to the player
+                    using (SqlCommand locationVisitedCommand = connection.CreateCommand())
+                    {
+                        locationVisitedCommand.CommandType = CommandType.Text;
+                        locationVisitedCommand.CommandText = "SELECT * FROM LocationVisted";
+
+                        SqlDataReader reader = locationVisitedCommand.ExecuteReader();
+
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                int id = (int)reader["ID"];
+
+                                // Add the Location ID to the player's LocationsVisited property
+                                player.LocationsVisited.Add(id);
+                            }
+                        }
+
+                        reader.Close();
                     }
 
                     // Now that the player has been built from the database, return it
+                    player.InitSource = Player.InitType.FromDataBase;
                     return player;
                 }
             }
@@ -123,7 +141,7 @@ namespace Engine
                 // a "null" player
             }
 
-        return null;
+            return null;
         }
 
         public static void SaveToDatabase(Player player)
@@ -302,6 +320,31 @@ namespace Engine
                             insertInventoryCommand.ExecuteNonQuery();
                         }
                     }
+
+                    // Delete existing LocationVisited rows
+                    using (SqlCommand delectLocationVisitedCommand = connection.CreateCommand())
+                    {
+                        delectLocationVisitedCommand.CommandType = CommandType.Text;
+                        delectLocationVisitedCommand.CommandText = "DELETE FROM LocationVisited";
+
+                        delectLocationVisitedCommand.ExecuteNonQuery();
+                    }
+
+                    // Insert LocationVisited rows, from the player object
+                    foreach (int locationVisitedID in player.LocationsVisited)
+                    {
+                        using (SqlCommand insertLocationVisitedCommand = connection.CreateCommand())
+                        {
+                            insertLocationVisitedCommand.CommandType = CommandType.Text;
+                            insertLocationVisitedCommand.CommandText = "INSERT INTO LocationVisited (ID) VALUES (@ID)";
+
+                            insertLocationVisitedCommand.Parameters.Add("@ID", SqlDbType.Int);
+                            insertLocationVisitedCommand.Parameters["@ID"].Value = locationVisitedID;
+
+                            insertLocationVisitedCommand.ExecuteNonQuery();
+                        }
+                    }
+
                 }
             }
             catch(Exception ex)
