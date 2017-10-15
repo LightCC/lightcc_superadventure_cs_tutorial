@@ -59,6 +59,12 @@
     <Compile Include="TradingScreen.Designer.cs">
       <DependentUpon>TradingScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="WorldMap.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WorldMap.Designer.cs">
+      <DependentUpon>WorldMap.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -93,6 +99,17 @@
       <Project>{c72f26e0-9023-4d16-a5ee-935117070e1e}</Project>
       <Name>Engine</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\FarmFields.png" />
+    <EmbeddedResource Include="Images\Farmhouse.png" />
+    <EmbeddedResource Include="Images\HerbalistsGarden.png" />
+    <EmbeddedResource Include="Images\HerbalistsHut.png" />
+    <EmbeddedResource Include="Images\Home.png" />
+    <EmbeddedResource Include="Images\SpiderForest.png" />
+    <EmbeddedResource Include="Images\TownGate.png" />
+    <EmbeddedResource Include="Images\TownSquare.png" />
+    <EmbeddedResource Include="Images\Trader.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
