@@ -295,5 +295,11 @@ namespace SuperAdventure
             File.WriteAllText(PLAYER_DATA_FILE_NAME, _player.ToXmlString());
         }
 
+        private void btnMap_Click(object sender, EventArgs e)
+        {
+            WorldMap mapScreen = new WorldMap();
+            mapScreen.StartPosition = FormStartPosition.CenterParent;
+            mapScreen.ShowDialog(this);
+        }
     }
 }
