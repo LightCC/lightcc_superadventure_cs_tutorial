@@ -18,15 +18,13 @@ namespace SuperAdventure
         {
             InitializeComponent();
 
-            _player = PlayerDataMapper.CreateFromDatabase();
+            _player = Player.CreateFromDatabase();
 
             if (_player == null)
             {
-                if (File.Exists(PLAYER_DATA_FILE_NAME))
-                {
-                    _player = Player.CreatePlayerFromXmlString(File.ReadAllText(PLAYER_DATA_FILE_NAME));
-                }
-                else
+                _player = Player.CreatePlayerFromXmlFile(PLAYER_DATA_FILE_NAME);
+
+                if (_player == null)
                 {
                     _player = Player.CreateDefaultPlayer();
                 }
@@ -293,6 +291,8 @@ namespace SuperAdventure
         private void SuperAdventure_FormClosing(object sender, FormClosingEventArgs e)
         {
             File.WriteAllText(PLAYER_DATA_FILE_NAME, _player.ToXmlString());
+
+            Player.SaveToDatabase(_player);
         }
 
         private void btnMap_Click(object sender, EventArgs e)

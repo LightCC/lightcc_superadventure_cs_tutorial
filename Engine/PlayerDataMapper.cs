@@ -4,10 +4,10 @@ using System.Data.SqlClient;
 
 namespace Engine
 {
-    public static class PlayerDataMapper
+    public partial class Player : LivingCreature
     {
-        private static readonly string _connectionString =
-            "Data Source=(local);Initial Catalog=SuperAdventure;Integrated Security=True";
+        //private static readonly string _connectionString = "Data Source=(local);Initial Catalog=SuperAdventure;Integrated Security=True";
+        private static readonly string _connectionString = "Server=RYZEN7_MSL\\SQLEX;Database=SuperAdventure;Trusted_Connection=True";
 
         public static Player CreateFromDatabase()
         {
@@ -49,7 +49,8 @@ namespace Engine
                         int currentLocationID = (int)reader["CurrentLocationID"];
 
                         // Create the Player object, with the saved game values
-                        player = Player.CreatePlayerFromDatabase(currentHitPoints, maximumHitPoints, gold, experiencePoints, currentLocationID);
+                        player = new Player(currentHitPoints, maximumHitPoints, gold, experiencePoints);
+                        player.CurrentLocation = World.LocationByID(currentLocationID);
 
                         reader.Close();
                     }
@@ -130,6 +131,7 @@ namespace Engine
                     }
 
                     // Now that the player has been built from the database, return it
+                    player.InitSource = Player.InitType.FromDataBase;
                     return player;
                 }
             }
