@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using Engine;
 
 namespace SuperAdventure
 {
@@ -9,19 +10,19 @@ namespace SuperAdventure
     {
         readonly Assembly _thisAssembly = Assembly.GetExecutingAssembly();
 
-        public WorldMap()
+        public WorldMap(Player player)
         {
             InitializeComponent();
 
-            SetImage(pic_0_2, "HerbalistsGarden");
-            SetImage(pic_1_2, "HerbalistsHut");
-            SetImage(pic_2_0, "FarmFields");
-            SetImage(pic_2_1, "Farmhouse");
-            SetImage(pic_2_2, "TownSquare");
-            SetImage(pic_2_3, "TownGate");
-            SetImage(pic_2_4, "Bridge");
-            SetImage(pic_2_5, "SpiderForest");
-            SetImage(pic_3_2, "Home");
+            SetImage(pic_0_2, player.LocationsVisited.Contains(World.LOCATION_ID_ALCHEMIST_GARDEN) ? "HerbalistsGarden" : "FogLocation");
+            SetImage(pic_1_2, player.LocationsVisited.Contains(World.LOCATION_ID_ALCHEMIST_HUT) ? "HerbalistsHut" : "FogLocation");
+            SetImage(pic_2_0, player.LocationsVisited.Contains(World.LOCATION_ID_FARM_FIELD) ? "FarmFields" : "FogLocation");
+            SetImage(pic_2_1, player.LocationsVisited.Contains(World.LOCATION_ID_FARMHOUSE) ? "Farmhouse" : "FogLocation");
+            SetImage(pic_2_2, player.LocationsVisited.Contains(World.LOCATION_ID_TOWN_SQUARE) ? "TownSquare" : "FogLocation");
+            SetImage(pic_2_3, player.LocationsVisited.Contains(World.LOCATION_ID_GUARD_POST) ? "TownGate" : "FogLocation");
+            SetImage(pic_2_4, player.LocationsVisited.Contains(World.LOCATION_ID_BRIDGE) ? "Bridge" : "FogLocation");
+            SetImage(pic_2_5, player.LocationsVisited.Contains(World.LOCATION_ID_SPIDER_FIELD) ? "SpiderForest" : "FogLocation");
+            SetImage(pic_3_2, player.LocationsVisited.Contains(World.LOCATION_ID_HOME) ? "Home" : "FogLocation");
         }
 
         private void SetImage(PictureBox pictureBoxTarget, string imageName)
