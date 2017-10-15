@@ -80,6 +80,8 @@ namespace Engine
 
         public BindingList<PlayerQuest> Quests { get; set; }
 
+        public List<int> LocationsVisited { get; set; }
+
         public HealingPotion CurrentPotion { get; set; }
 
 #endregion PROPERTIES
@@ -94,6 +96,7 @@ namespace Engine
 
             Inventory = new BindingList<InventoryItem>();
             Quests = new BindingList<PlayerQuest>();
+            LocationsVisited = new List<int>();
         }
 
 #endregion PRIVATE CONSTRUCTOR
@@ -616,8 +619,13 @@ namespace Engine
                 return;  // return without moving to the new location
             }
 
-            // We have any required item, or there wasn't an item required,
+            // We have any required item, or there wasn't an item required, the player can enter this new, requested location
             CurrentLocation = newLocation;
+
+            if (!LocationsVisited.Contains(CurrentLocation.ID))
+            {
+                LocationsVisited.Add(CurrentLocation.ID);
+            }
 
             CompletelyHeal();
 
