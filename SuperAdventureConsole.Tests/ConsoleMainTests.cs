@@ -1,4 +1,5 @@
-﻿using Engine;
+﻿using System;
+using Engine;
 using FluentAssertions;
 using Ploeh.AutoFixture.Xunit2;
 using Xunit;
@@ -13,6 +14,7 @@ namespace SuperAdventureConsole_Tests
             var sut = Player.CreateDefaultPlayer();
             sut.Gold = -1;
 
+            throw new NotImplementedException();
         }
 
         [Theory]
